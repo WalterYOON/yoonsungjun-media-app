@@ -1809,7 +1809,7 @@ const getTaskColorByCategory = (task, linkedPlan) => {
         return {
             bg: 'bg-amber-900/40',
             text: 'text-[#a0714a]',
-            border: 'border-[#a0714a]/40'
+            border: 'border-[#a0714a]/40',
             isDraft: false
         };
     
@@ -1819,7 +1819,7 @@ const getTaskColorByCategory = (task, linkedPlan) => {
             bg: 'bg-[#44403c]',
             text: 'text-[#a89880]',
             border: 'border-[#57534e]',
-            completed: true
+            completed: true,
             isDraft: false
         };
     
