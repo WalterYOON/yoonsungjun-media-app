@@ -7,7 +7,7 @@ import { formatDateLocal, parseLocalDate } from '../../utils/dateUtils';
 import RichTextEditor from '../common/RichTextEditor';
 
 const ProjectTab = () => {
-    const { plans, filteredTasks, toggleModal, setSelectedItems, operations, showToast, openConfirm, profile } = useApp();
+    const { plans, tasks, filteredTasks, toggleModal, setSelectedItems, operations, showToast, openConfirm, profile } = useApp();
     const [selected, setSelected] = useState(null);
     const [showCreate, setShowCreate] = useState(false);
     const [newP, setNewP] = useState({ topic: '', type: 'main', planner: '', uploadDate: '', shootingType: 'indoor' });
@@ -26,7 +26,7 @@ const ProjectTab = () => {
 
     const calcProgress = useCallback((plan) => { const planTasks = filteredTasks.filter(t => t.planId === plan.id && !t.isDraftPlaceholder && t.type !== 'personal'); let totalDays = 0, completedDaysCount = 0; planTasks.forEach(t => { const start = parseLocalDate(t.workStartDate); const end = parseLocalDate(t.workEndDate); const duration = Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1; if (duration > 0) totalDays += duration; if (t.completedDates && Array.isArray(t.completedDates)) completedDaysCount += t.completedDates.length; }); return totalDays === 0 ? 0 : Math.min(100, Math.round((completedDaysCount / totalDays) * 100)); }, [filteredTasks]);
 
-    const getPlanTasks = useCallback((planId) => filteredTasks.filter(t => t.planId === planId && !t.isDraftPlaceholder && t.type !== 'personal'), [filteredTasks]);
+    const getPlanTasks = useCallback((planId) => tasks.filter(t => t.planId === planId && !t.isDraftPlaceholder && t.type !== 'personal'), [tasks]);
 
     const selectPlan = (plan) => { setSelected(plan); setShowCreate(false); setEditingInfo(false); setEditingScenario(false); setAddingSchedule(false); };
     const handleCreate = async () => { if (!newP.topic?.trim()) return; const result = await operations.savePlan({ ...newP, status: 'draft' }); if (result?.success) { showToast('프로젝트가 등록되었습니다.', 'success'); setShowCreate(false); setNewP({ topic: '', type: 'main', planner: profile || TEAM_MEMBERS[0], uploadDate: '', shootingType: 'indoor' }); } };
