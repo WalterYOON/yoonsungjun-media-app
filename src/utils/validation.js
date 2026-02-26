@@ -83,13 +83,16 @@ export const validatePlan = (plan) => {
     if (!topicCheck.valid) errors.push(topicCheck.message);
     const plannerCheck = validateRequiredString(plan.planner, '기획자', 1, 50);
     if (!plannerCheck.valid) errors.push(plannerCheck.message);
-    const uploadDateCheck = validateDate(plan.uploadDate, '업로드 예정일');
-    if (!uploadDateCheck.valid) errors.push(uploadDateCheck.message);
+    // 업로드 예정일 - 입력된 경우에만 형식 검증 (선택 항목)
+    if (plan.uploadDate && plan.uploadDate.trim()) {
+        const uploadDateCheck = validateDate(plan.uploadDate, '업로드 예정일');
+        if (!uploadDateCheck.valid) errors.push(uploadDateCheck.message);
+    }
     const typeCheck = validateEnum(plan.type, PROJECT_TYPES, '프로젝트 타입');
     if (!typeCheck.valid) errors.push(typeCheck.message);
     if (plan.status && !PLAN_COLUMNS[plan.status]) errors.push('유효하지 않은 상태 값입니다.');
     if (plan.shootType && !['indoor', 'outdoor'].includes(plan.shootType)) errors.push('촬영 타입은 indoor 또는 outdoor만 가능합니다.');
-    if (plan.shootType === 'outdoor' && !plan.location?.trim()) errors.push('외부 촬영 시 장소를 입력해주세요.');
+    // 외부 로케이션은 필수 아님 (입력 권장만)
     return { valid: errors.length === 0, message: errors.join('\n'), errors };
 };
 
