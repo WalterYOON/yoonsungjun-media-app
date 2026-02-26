@@ -6,17 +6,18 @@ import { formatDateLocal, getWeekDays, getDaysDifference, parseLocalDate } from 
 
 // 업무 타입 기반 색상 결정 함수
 export const getTaskColorByCategory = (task, linkedPlan) => {
-    if (task.type === 'personal') return { bg: 'bg-amber-900/40', text: 'text-[#a0714a]', border: 'border-[#a0714a]/40' };
-    if (linkedPlan?.status === 'completed') return { bg: 'bg-[#44403c]', text: 'text-[#a89880]', border: 'border-[#57534e]', completed: true };
+    const isDraft = linkedPlan?.status === 'draft';
+    if (task.type === 'personal') return { bg: 'bg-amber-900/40', text: 'text-[#a0714a]', border: 'border-[#a0714a]/40', isDraft: false };
+    if (linkedPlan?.status === 'completed') return { bg: 'bg-[#44403c]', text: 'text-[#a89880]', border: 'border-[#57534e]', completed: true, isDraft: false };
     const CATEGORY_COLORS = {
-        '대본': { bg: 'bg-blue-900/40', text: 'text-blue-300', border: 'border-[#5d6a7a]/40' },
-        '촬영': { bg: 'bg-orange-900/40', text: 'text-orange-300', border: 'border-orange-500/40' },
-        '편집': { bg: 'bg-emerald-900/40', text: 'text-emerald-300', border: 'border-[#5d7a5d]/40' },
-        '업데이트': { bg: 'bg-purple-900/40', text: 'text-purple-300', border: 'border-purple-500/40' }
+        '대본': { bg: isDraft ? 'bg-blue-900/20' : 'bg-blue-900/40', text: 'text-blue-300', border: 'border-[#5d6a7a]/40' },
+        '촬영': { bg: isDraft ? 'bg-orange-900/20' : 'bg-orange-900/40', text: 'text-orange-300', border: 'border-orange-500/40' },
+        '편집': { bg: isDraft ? 'bg-emerald-900/20' : 'bg-emerald-900/40', text: 'text-emerald-300', border: 'border-[#5d7a5d]/40' },
+        '업데이트': { bg: isDraft ? 'bg-purple-900/20' : 'bg-purple-900/40', text: 'text-purple-300', border: 'border-purple-500/40' }
     };
     const primaryCategory = task.category?.[0];
-    if (primaryCategory && CATEGORY_COLORS[primaryCategory]) return CATEGORY_COLORS[primaryCategory];
-    return { bg: 'bg-[#4a3d30]/40', text: 'text-slate-300', border: 'border-[#f5f0e6]0/40' };
+    if (primaryCategory && CATEGORY_COLORS[primaryCategory]) return { ...CATEGORY_COLORS[primaryCategory], isDraft };
+    return { bg: isDraft ? 'bg-[#4a3d30]/20' : 'bg-[#4a3d30]/40', text: 'text-slate-300', border: 'border-[#f5f0e6]/40', isDraft };
 };
 
 // TaskBar
@@ -24,10 +25,15 @@ export const TaskBar = React.memo(({ task, plans, isPersonal, onClick }) => {
     const linkedPlan = useMemo(() => isPersonal ? null : plans.find(p => p.id === task.planId), [isPersonal, plans, task.planId]);
     const colorScheme = useMemo(() => getTaskColorByCategory(task, linkedPlan), [task, linkedPlan]);
     const isCompleted = colorScheme.completed || false;
+    const isDraft = colorScheme.isDraft || false;
     let IconComp = null;
     if (isPersonal) { const cat = task.category?.[0]; IconComp = PERSONAL_CATEGORIES[cat]?.icon; }
     else { const primaryCategory = task.category?.[0]; IconComp = WORK_CATEGORIES[primaryCategory]?.icon || FileText; }
-    const finalClasses = isCompleted ? `${colorScheme.bg} ${colorScheme.text} border ${colorScheme.border} line-through decoration-[#78716c] opacity-60` : `${colorScheme.bg} ${colorScheme.text} border ${colorScheme.border}`;
+    const finalClasses = isCompleted
+        ? `${colorScheme.bg} ${colorScheme.text} border ${colorScheme.border} line-through decoration-[#78716c] opacity-60`
+        : isDraft
+            ? `${colorScheme.bg} ${colorScheme.text} border border-dashed ${colorScheme.border}`
+            : `${colorScheme.bg} ${colorScheme.text} border ${colorScheme.border}`;
     const totalWorkDays = getDaysDifference(task.workStartDate, task.workEndDate) + 1;
     const getProgress = () => { if (task.status === 'done') return 100; if (!task.completedDates || task.completedDates.length === 0) return 0; if (totalWorkDays <= 0) return 0; return Math.round((task.completedDates.length / totalWorkDays) * 100); };
     const progress = getProgress();

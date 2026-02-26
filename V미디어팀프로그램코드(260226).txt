@@ -1804,14 +1804,14 @@ const PlanCard = React.memo(({ plan, tasks, operations, onClick, onTaskStatusCha
 
 // [New] 업무 타입 기반 색상 결정 함수
 const getTaskColorByCategory = (task, linkedPlan) => {
-    // 개인 일정
+    const isDraft = linkedPlan?.status === 'draft';
     if (task.type === 'personal') {
         return {
             bg: 'bg-amber-900/40',
             text: 'text-[#a0714a]',
             border: 'border-[#a0714a]/40'
+            isDraft: false
         };
-    }
     
     // 완료된 프로젝트는 회색 처리
     if (linkedPlan?.status === 'completed') {
@@ -1820,28 +1820,28 @@ const getTaskColorByCategory = (task, linkedPlan) => {
             text: 'text-[#a89880]',
             border: 'border-[#57534e]',
             completed: true
+            isDraft: false
         };
-    }
     
     // 업무 카테고리별 색상 정의
     const CATEGORY_COLORS = {
         '대본': {
-            bg: 'bg-blue-900/40',
+            bg: isDraft ? 'bg-blue-900/20' : 'bg-blue-900/40',
             text: 'text-blue-300',
             border: 'border-[#5d6a7a]/40'
         },
         '촬영': {
-            bg: 'bg-orange-900/40',
+            bg: isDraft ? 'bg-orange-900/20' : 'bg-orange-900/40',
             text: 'text-orange-300',
             border: 'border-orange-500/40'
         },
         '편집': {
-            bg: 'bg-emerald-900/40',
+            bg: isDraft ? 'bg-emerald-900/20' : 'bg-emerald-900/40',
             text: 'text-emerald-300',
             border: 'border-[#5d7a5d]/40'
         },
         '업데이트': {
-            bg: 'bg-purple-900/40',
+            bg: isDraft ? 'bg-purple-900/20' : 'bg-purple-900/40',
             text: 'text-purple-300',
             border: 'border-purple-500/40'
         }
@@ -1851,12 +1851,12 @@ const getTaskColorByCategory = (task, linkedPlan) => {
     const primaryCategory = task.category?.[0];
     
     if (primaryCategory && CATEGORY_COLORS[primaryCategory]) {
-        return CATEGORY_COLORS[primaryCategory];
+        return { ...CATEGORY_COLORS[primaryCategory], isDraft };
     }
     
     // 카테고리 없으면 기본 색상
     return {
-        bg: 'bg-[#4a3d30]/40',
+        bg: isDraft ? 'bg-[#4a3d30]/20' : 'bg-[#4a3d30]/40',
         text: 'text-slate-300',
         border: 'border-[#f5f0e6]0/40'
     };
