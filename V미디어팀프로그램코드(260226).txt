@@ -1877,6 +1877,7 @@ const TaskBar = React.memo(({ task, plans, isPersonal, onClick }) => {
     );
     
     const isCompleted = colorScheme.completed || false;
+    const isDraft = colorScheme.isDraft || false;
     
     // 아이콘 결정 (업무 타입별)
     let IconComp = null;
@@ -1891,7 +1892,9 @@ const TaskBar = React.memo(({ task, plans, isPersonal, onClick }) => {
     // 최종 클래스 조합
     const finalClasses = isCompleted
         ? `${colorScheme.bg} ${colorScheme.text} border ${colorScheme.border} line-through decoration-[#78716c] opacity-60`
-        : `${colorScheme.bg} ${colorScheme.text} border ${colorScheme.border}`;
+        : isDraft
+            ? `${colorScheme.bg} ${colorScheme.text} border border-dashed ${colorScheme.border}`
+            : `${colorScheme.bg} ${colorScheme.text} border ${colorScheme.border}`;
     
     // [New] 진행률 계산 로직
     const totalWorkDays = getDaysDifference(task.workStartDate, task.workEndDate) + 1;
