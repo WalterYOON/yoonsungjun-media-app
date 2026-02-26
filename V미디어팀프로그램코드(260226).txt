@@ -1812,7 +1812,7 @@ const getTaskColorByCategory = (task, linkedPlan) => {
             border: 'border-[#a0714a]/40',
             isDraft: false
         };
-    
+    }
     // 완료된 프로젝트는 회색 처리
     if (linkedPlan?.status === 'completed') {
         return {
@@ -1822,7 +1822,7 @@ const getTaskColorByCategory = (task, linkedPlan) => {
             completed: true,
             isDraft: false
         };
-    
+    }
     // 업무 카테고리별 색상 정의
     const CATEGORY_COLORS = {
         '대본': {
