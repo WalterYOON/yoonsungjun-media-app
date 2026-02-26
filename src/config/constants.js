@@ -35,7 +35,7 @@ export const PLAN_COLUMNS = {
     'completed': { label: '완료', color: 'bg-[#5d7a5d]/20 text-[#5d7a5d] border-[#5d7a5d]/30' }
 };
 
-export const AUTHORS = ['윤성준', '이현경', '석재균'];
+export const AUTHORS = ['윤성준', '이현경'];
 export const TEAM_MEMBERS = AUTHORS;
 export const DEFAULT_AUTHOR = AUTHORS[0];
 

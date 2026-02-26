@@ -12,13 +12,6 @@ export const SAMPLE_PLANS = [
     { id: 'plan-013', topic: '다이어트 식단 일기', type: 'main', uploadDate: '2026-02-18', description: '2주 건강식 챌린지', planner: '이현경', status: 'draft', shootType: 'indoor', location: '' },
     { id: 'plan-014', topic: '아이돌 커버댄스 #shorts', type: 'shorts', uploadDate: '2026-02-22', description: '에스파 신곡 포인트 안무', planner: '이현경', status: 'draft', shootType: 'outdoor', location: '한강공원' },
     { id: 'plan-015', topic: '겨울 스킨케어 루틴', type: 'main', uploadDate: '2026-01-20', description: '건조한 피부 집중 케어', planner: '이현경', status: 'completed', shootType: 'indoor', location: '' },
-
-    // ========== 석재균 담당 ==========
-    { id: 'plan-016', topic: '게임 리뷰 특집', type: 'main', uploadDate: '2026-02-07', description: '2026 기대작 TOP 5', planner: '석재균', status: 'active', shootType: 'indoor', location: '' },
-    { id: 'plan-017', topic: '먹방 브이로그 #shorts', type: 'shorts', uploadDate: '2026-02-11', description: '편의점 신상 털기', planner: '석재균', status: 'active', shootType: 'outdoor', location: '편의점' },
-    { id: 'plan-018', topic: '자취 요리 #shorts', type: 'shorts', uploadDate: '2026-02-25', description: '5분 완성 야식 레시피', planner: '석재균', status: 'draft', shootType: 'indoor', location: '' },
-    { id: 'plan-019', topic: '테크 언박싱', type: 'main', uploadDate: '2026-03-05', description: '갤럭시 S26 개봉기', planner: '석재균', status: 'draft', shootType: 'indoor', location: '' },
-    { id: 'plan-020', topic: '새벽 루틴 #shorts', type: 'shorts', uploadDate: '2026-01-28', description: '직장인 모닝 루틴', planner: '석재균', status: 'completed', shootType: 'indoor', location: '' }
 ];
 
 export const SAMPLE_TASKS = [
@@ -32,7 +25,7 @@ export const SAMPLE_TASKS = [
     { id: 'task-010', planId: 'plan-001', topic: '겨울 패션 하울', author: '이현경', type: 'task', category: ['편집'], details: '하울 영상 편집', workStartDate: '2026-02-01', workEndDate: '2026-02-03', status: 'in_progress', completedDates: ['2026-02-01', '2026-02-02'] },
 
     { id: 'task-012', planId: 'plan-002', topic: '카페 투어 #shorts', author: '윤성준', type: 'task', category: ['촬영'], details: '성수동 카페 촬영', workStartDate: '2026-02-02', workEndDate: '2026-02-02', status: 'done', completedDates: ['2026-02-02'] },
-    { id: 'task-013', planId: 'plan-002', topic: '카페 투어 #shorts', author: '석재균', type: 'task', category: ['편집'], details: '카페 무드 편집', workStartDate: '2026-02-04', workEndDate: '2026-02-05', status: 'in_progress', completedDates: ['2026-02-04'] },
+    { id: 'task-013', planId: 'plan-002', topic: '카페 투어 #shorts', author: '이현경', type: 'task', category: ['편집'], details: '카페 무드 편집', workStartDate: '2026-02-04', workEndDate: '2026-02-05', status: 'in_progress', completedDates: ['2026-02-04'] },
 
     { id: 'task-014', planId: 'plan-003', topic: '발렌타인 초콜릿 만들기', author: '윤성준', type: 'task', category: ['대본'], details: '레시피 및 재료 준비', workStartDate: '2026-02-05', workEndDate: '2026-02-05', status: 'done', completedDates: ['2026-02-05'] },
     { id: 'task-015', planId: 'plan-003', topic: '발렌타인 초콜릿 만들기', author: '윤성준', type: 'task', category: ['촬영'], details: '쿠킹 영상 촬영', workStartDate: '2026-02-07', workEndDate: '2026-02-07', status: 'in_progress', completedDates: [] },
@@ -41,28 +34,16 @@ export const SAMPLE_TASKS = [
     // ========== 이현경 프로젝트 업무 ==========
     { id: 'task-030', planId: 'plan-015', topic: '겨울 스킨케어 루틴', author: '이현경', type: 'task', category: ['대본'], details: '스킨케어 순서 정리', workStartDate: '2026-01-10', workEndDate: '2026-01-11', status: 'done', completedDates: ['2026-01-10', '2026-01-11'] },
     { id: 'task-031', planId: 'plan-015', topic: '겨울 스킨케어 루틴', author: '이현경', type: 'task', category: ['촬영'], details: '스킨케어 GRWM 촬영', workStartDate: '2026-01-13', workEndDate: '2026-01-14', status: 'done', completedDates: ['2026-01-13', '2026-01-14'] },
-    { id: 'task-032', planId: 'plan-015', topic: '겨울 스킨케어 루틴', author: '석재균', type: 'task', category: ['편집'], details: '스킨케어 영상 편집', workStartDate: '2026-01-16', workEndDate: '2026-01-18', status: 'done', completedDates: ['2026-01-16', '2026-01-17', '2026-01-18'] },
+    { id: 'task-032', planId: 'plan-015', topic: '겨울 스킨케어 루틴', author: '윤성준', type: 'task', category: ['편집'], details: '스킨케어 영상 편집', workStartDate: '2026-01-16', workEndDate: '2026-01-18', status: 'done', completedDates: ['2026-01-16', '2026-01-17', '2026-01-18'] },
 
     { id: 'task-033', planId: 'plan-011', topic: '봄 코디 추천', author: '이현경', type: 'task', category: ['대본'], details: 'S/S 트렌드 리서치', workStartDate: '2026-02-03', workEndDate: '2026-02-04', status: 'done', completedDates: ['2026-02-03', '2026-02-04'] },
     { id: 'task-034', planId: 'plan-011', topic: '봄 코디 추천', author: '이현경', type: 'task', category: ['촬영'], details: '코디 착장 촬영', workStartDate: '2026-02-06', workEndDate: '2026-02-07', status: 'in_progress', completedDates: ['2026-02-06'] },
     { id: 'task-035', planId: 'plan-011', topic: '봄 코디 추천', author: '윤성준', type: 'task', category: ['편집'], details: '코디 영상 편집', workStartDate: '2026-02-09', workEndDate: '2026-02-10', status: 'todo', completedDates: [] },
 
     { id: 'task-036', planId: 'plan-012', topic: '홈카페 레시피 #shorts', author: '이현경', type: 'task', category: ['촬영'], details: '달고나 만들기 촬영', workStartDate: '2026-02-01', workEndDate: '2026-02-01', status: 'done', completedDates: ['2026-02-01'] },
-    { id: 'task-037', planId: 'plan-012', topic: '홈카페 레시피 #shorts', author: '석재균', type: 'task', category: ['편집'], details: '숏폼 편집', workStartDate: '2026-02-03', workEndDate: '2026-02-04', status: 'in_progress', completedDates: ['2026-02-03'] },
-
-    // ========== 석재균 프로젝트 업무 ==========
-    { id: 'task-040', planId: 'plan-020', topic: '새벽 루틴 #shorts', author: '석재균', type: 'task', category: ['촬영'], details: '모닝 루틴 촬영', workStartDate: '2026-01-22', workEndDate: '2026-01-23', status: 'done', completedDates: ['2026-01-22', '2026-01-23'] },
-    { id: 'task-041', planId: 'plan-020', topic: '새벽 루틴 #shorts', author: '석재균', type: 'task', category: ['편집'], details: '숏폼 컷편집', workStartDate: '2026-01-25', workEndDate: '2026-01-26', status: 'done', completedDates: ['2026-01-25', '2026-01-26'] },
-
-    { id: 'task-042', planId: 'plan-016', topic: '게임 리뷰 특집', author: '석재균', type: 'task', category: ['대본'], details: '기대작 리스트업', workStartDate: '2026-01-30', workEndDate: '2026-01-31', status: 'done', completedDates: ['2026-01-30', '2026-01-31'] },
-    { id: 'task-043', planId: 'plan-016', topic: '게임 리뷰 특집', author: '석재균', type: 'task', category: ['촬영'], details: '게임 플레이 녹화', workStartDate: '2026-02-02', workEndDate: '2026-02-04', status: 'in_progress', completedDates: ['2026-02-02', '2026-02-03'] },
-    { id: 'task-044', planId: 'plan-016', topic: '게임 리뷰 특집', author: '이현경', type: 'task', category: ['편집'], details: '리뷰 영상 편집', workStartDate: '2026-02-06', workEndDate: '2026-02-07', status: 'todo', completedDates: [] },
-
-    { id: 'task-045', planId: 'plan-017', topic: '먹방 브이로그 #shorts', author: '석재균', type: 'task', category: ['촬영'], details: '편의점 신상 구매', workStartDate: '2026-02-05', workEndDate: '2026-02-05', status: 'done', completedDates: ['2026-02-05'] },
-    { id: 'task-046', planId: 'plan-017', topic: '먹방 브이로그 #shorts', author: '윤성준', type: 'task', category: ['편집'], details: '먹방 숏폼 편집', workStartDate: '2026-02-07', workEndDate: '2026-02-08', status: 'in_progress', completedDates: ['2026-02-07'] },
+    { id: 'task-037', planId: 'plan-012', topic: '홈카페 레시피 #shorts', author: '윤성준', type: 'task', category: ['편집'], details: '숏폼 편집', workStartDate: '2026-02-03', workEndDate: '2026-02-04', status: 'in_progress', completedDates: ['2026-02-03'] },
 
     // ========== 개인 일정 ==========
-    { id: 'task-021', planId: null, topic: '개인 일정', author: '석재균', type: 'personal', category: ['연차'], details: '개인 휴가', workStartDate: '2026-02-13', workEndDate: '2026-02-14', status: 'todo', completedDates: [] },
     { id: 'task-022', planId: null, topic: '개인 일정', author: '이현경', type: 'personal', category: ['오전반차'], details: '병원 검진', workStartDate: '2026-02-06', workEndDate: '2026-02-06', status: 'done', completedDates: ['2026-02-06'] },
     { id: 'task-023', planId: null, topic: '개인 일정', author: '윤성준', type: 'personal', category: ['미팅'], details: '광고주 미팅', workStartDate: '2026-02-09', workEndDate: '2026-02-09', status: 'todo', completedDates: [] }
 ];
