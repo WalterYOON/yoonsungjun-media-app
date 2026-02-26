@@ -64,7 +64,7 @@ export const AppProvider = ({ children }) => {
                 .filter(sp => !deletedSamplePlans.includes(sp.id))
                 .map(sp => localModifiedPlans[sp.id] ? { ...sp, ...localModifiedPlans[sp.id] } : sp);
             const mergedPlans = [...baseSamplePlans.filter(sp => !firebaseData.some(fp => fp.id === sp.id)), ...firebaseData];
-            setPlans(mergedPlans.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate)));
+            setPlans(mergedPlans.sort((a, b) => new Date(b.uploadDate || 0) - new Date(a.uploadDate || 0)));
         });
         const unsubTasks = onSnapshot(tasksQuery, (snap) => {
             const firebaseData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -437,9 +437,9 @@ export const AppProvider = ({ children }) => {
             if (t.type === 'personal') return authorMatch && statusMatch;
             if (t.isDraftPlaceholder) return false;
             const linkedPlan = plans.find(p => p.id === t.planId);
+            // 연결된 플랜이 없는 경우 (고아 task) 제외
             if (!linkedPlan) { if (t.planId && !t.planId.startsWith('plan-')) { console.warn(`[Orphan Task] 연결된 프로젝트 없음: task.id=${t.id}, planId=${t.planId}`); } return false; }
-            const isPlanVisible = linkedPlan.status === 'active' || linkedPlan.status === 'completed';
-            if (!isPlanVisible) return false;
+            // draft 포함 모든 존재하는 플랜의 task를 표시 (삭제된 플랜만 제외)
             return authorMatch && statusMatch;
         });
     }, [tasks, selectedAuthors, filterStatus, plans]);

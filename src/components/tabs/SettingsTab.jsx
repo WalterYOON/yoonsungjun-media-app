@@ -28,7 +28,7 @@ const SettingsTab = () => {
             ];
             const activePlans = [
                 { topic: '[예시] 제주도 여행 브이로그', type: 'main', status: 'active', planner: TEAM_MEMBERS[0], description: '제주도 여행 기록', uploadDate: rndDate(3, 7) },
-                { topic: '[예시] 게임 리뷰 특집', type: 'main', status: 'active', planner: TEAM_MEMBERS[2] || TEAM_MEMBERS[0], description: '2026 기대작 TOP5', uploadDate: rndDate(2, 5) },
+                { topic: '[예시] 게임 리뷰 특집', type: 'main', status: 'active', planner: TEAM_MEMBERS[1] || TEAM_MEMBERS[0], description: '2026 기대작 TOP5', uploadDate: rndDate(2, 5) },
             ];
             const createdActiveIds = [];
             for (const plan of [...draftPlans, ...activePlans]) { const result = await operations.savePlan(plan); if (result?.success && result?.id && plan.status === 'active') { createdActiveIds.push({ id: result.id, topic: plan.topic }); } }
