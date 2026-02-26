@@ -2531,7 +2531,7 @@ const ProjectTab = () => {
     const [addingSchedule, setAddingSchedule] = useState(false);
     const [infoForm, setInfoForm] = useState({});
     const [scenarioVal, setScenarioVal] = useState('');
-    const [newSchedule, setNewSchedule] = useState({ category:['대본'], author:'', workStartDate:'', workEndDate:'', details:'', status:'todo' });
+    const [newSchedule, setNewSchedule] = useState({ category:[], author:'', workStartDate:'', workEndDate:'', details:'', status:'todo' });
     const [typeFilter, setTypeFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
     const { profile } = useApp();
@@ -2613,7 +2613,7 @@ const ProjectTab = () => {
         }, false, false, false);
         if (result?.success) {
             setAddingSchedule(false);
-            setNewSchedule({ category:['대본'], author: profile || TEAM_MEMBERS[0], workStartDate:'', workEndDate:'', details:'', status:'todo' });
+            setNewSchedule({ category:[], author: profile || TEAM_MEMBERS[0], workStartDate:'', workEndDate:'', details:'', status:'todo' });
             showToast('일정이 추가되었습니다.', 'success');
         } else {
             showToast(result?.message || '일정 추가에 실패했습니다.', 'error');
@@ -2934,7 +2934,7 @@ const ProjectTab = () => {
                                     <div className="flex items-center justify-between px-5 py-3 border-b border-[#e8dcc8] bg-[#f0e9de]">
                                         <span className="font-bold text-[#42392e] text-sm">📅 일정 관리 <span className="text-xs text-[#a89880] font-normal">({planTasks.length}건)</span></span>
                                         {!addingSchedule ? (
-                                            <button onClick={() => { setNewSchedule({ category:['대본'], author: profile || TEAM_MEMBERS[0], workStartDate:'', workEndDate:'', details:'', status:'todo' }); setAddingSchedule(true); }}
+                                            <button onClick={() => { setNewSchedule({ category:[], author: profile || TEAM_MEMBERS[0], workStartDate:'', workEndDate:'', details:'', status:'todo' }); setAddingSchedule(true); }}
                                                 className="text-xs font-bold text-[#857460] hover:text-[#a0714a] transition-colors">+ 일정 추가</button>
                                         ) : (
                                             <div className="flex gap-2">
@@ -2947,12 +2947,11 @@ const ProjectTab = () => {
                                         {/* 추가 폼 */}
                                         {addingSchedule && (
                                             <div className="bg-[#f0e9de] rounded-xl p-4 border border-[#d4c4ac] mb-4 space-y-3">
+                                                    <div><label className="text-xs text-[#a89880] block mb-1">업무 구분 <span className="text-[#c4b49a] font-normal">(복수 선택 가능)</span></label>
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            {Object.entries(WORK_CATEGORIES).map(([cat, cfg]) => { const Icon = cfg.icon; const isSel = newSchedule.category.includes(cat); return (<button key={cat} type="button" onClick={() => setNewSchedule(s => ({ ...s, category: s.category.includes(cat) ? s.category.filter(c => c !== cat) : [...s.category, cat] }))} className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 ${isSel ? 'bg-[#4d5a6a] text-[#faf6ef] border-[#4d5a6a] shadow-sm' : 'bg-[#faf6ef] text-[#857460] border-[#d4c4ac] hover:border-[#5d6a7a] hover:text-[#5d6a7a]'}`}><Icon size={11}/>{cat}</button>); })}
+                                                        </div></div>
                                                 <div className="grid grid-cols-2 gap-3">
-                                                    <div><label className="text-xs text-[#a89880] block mb-1">업무 구분</label>
-                                                        <select className="w-full px-3 py-2 bg-[#faf6ef] border border-[#d4c4ac] rounded-lg text-sm focus:outline-none"
-                                                            value={newSchedule.category?.[0]||'대본'} onChange={e => setNewSchedule(s=>({...s, category:[e.target.value]}))}>
-                                                            {Object.keys(WORK_CATEGORIES).map(c => <option key={c}>{c}</option>)}
-                                                        </select></div>
                                                     <div><label className="text-xs text-[#a89880] block mb-1">담당자</label>
                                                         <select className="w-full px-3 py-2 bg-[#faf6ef] border border-[#d4c4ac] rounded-lg text-sm focus:outline-none"
                                                             value={newSchedule.author} onChange={e => setNewSchedule(s=>({...s, author:e.target.value}))}>
