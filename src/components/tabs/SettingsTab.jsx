@@ -1,11 +1,12 @@
 // SettingsTab - 원본 라인 3900~4038
 import React, { useState, useRef } from 'react';
-import { Settings, LogOut, Archive, Upload, Loader, AlertTriangle, Zap, Trash } from 'lucide-react';
+import { Settings, LogOut, Archive, Upload, Loader, AlertTriangle, Zap, Trash, Lock, Eye, EyeOff, Check } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TEAM_MEMBERS } from '../../config/constants';
 import { formatDateLocal } from '../../utils/dateUtils';
 import { collection, getDocs, writeBatch } from 'firebase/firestore';
-import { db, appId } from '../../config/firebase';
+import { db, appId, auth } from '../../config/firebase';
+import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
 
 const SettingsTab = () => {
     const { profile, logout, operations, showToast, openConfirm } = useApp();
@@ -14,6 +15,52 @@ const SettingsTab = () => {
     const [isImporting, setIsImporting] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [isClearing, setIsClearing] = useState(false);
+
+    // 비밀번호 변경 상태
+    const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
+    const [pwLoading, setPwLoading] = useState(false);
+    const [pwError, setPwError] = useState('');
+    const [pwSuccess, setPwSuccess] = useState(false);
+    const [showPw, setShowPw] = useState({ current: false, next: false, confirm: false });
+
+    const toggleShow = (field) => setShowPw(prev => ({ ...prev, [field]: !prev[field] }));
+
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        setPwError('');
+        setPwSuccess(false);
+        if (pwForm.next.length < 6) { setPwError('비밀번호는 6자 이상이어야 합니다.'); return; }
+        if (pwForm.next !== pwForm.confirm) { setPwError('새 비밀번호가 일치하지 않습니다.'); return; }
+        if (pwForm.current === pwForm.next) { setPwError('현재 비밀번호와 동일한 비밀번호로는 변경할 수 없습니다.'); return; }
+        setPwLoading(true);
+        try {
+            const currentUser = auth.currentUser;
+            if (!currentUser) throw new Error('not-authenticated');
+            // 재인증 (보안: 변경 전 현재 비밀번호 확인)
+            const credential = EmailAuthProvider.credential(currentUser.email, pwForm.current);
+            await reauthenticateWithCredential(currentUser, credential);
+            // 비밀번호 변경
+            await updatePassword(currentUser, pwForm.next);
+            setPwSuccess(true);
+            setPwForm({ current: '', next: '', confirm: '' });
+            showToast('비밀번호가 변경되었습니다.', 'success');
+            setTimeout(() => setPwSuccess(false), 3000);
+        } catch (err) {
+            if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                setPwError('현재 비밀번호가 올바르지 않습니다.');
+            } else if (err.code === 'auth/too-many-requests') {
+                setPwError('너무 많은 시도. 잠시 후 다시 시도해주세요.');
+            } else if (err.code === 'auth/requires-recent-login') {
+                setPwError('보안을 위해 로그아웃 후 다시 로그인해주세요.');
+            } else if (err.message === 'not-authenticated') {
+                setPwError('로그인 상태가 아닙니다.');
+            } else {
+                setPwError('비밀번호 변경에 실패했습니다.');
+            }
+        } finally {
+            setPwLoading(false);
+        }
+    };
 
     const handleExport = async () => { setIsExporting(true); await operations.exportAllData(); setIsExporting(false); };
     const handleImport = async (e) => { const file = e.target.files?.[0]; if (!file) return; if (!file.name.endsWith('.json')) { alert('JSON 파일만 업로드 가능합니다.'); return; } setIsImporting(true); await operations.importAllData(file); setIsImporting(false); if (fileInputRef.current) { fileInputRef.current.value = ''; } };
@@ -47,6 +94,32 @@ const SettingsTab = () => {
     return (
         <div className="max-w-2xl mx-auto space-y-4">
             <div className="vj-card bg-[#faf6ef] rounded-2xl p-6 border border-[#d4c4ac]"><h2 className="text-xl font-black text-[#42392e] flex items-center gap-2 mb-6"><Settings size={24} className="text-[#a0714a]" />설정</h2><div className="mb-6 pb-6 border-b border-[#d4c4ac]"><h3 className="text-sm font-bold text-[#857460] mb-3">현재 사용자</h3><div className="flex items-center gap-4"><div className="w-16 h-16 bg-gradient-to-br from-[#a0714a] to-[#8a5d3a] rounded-2xl flex items-center justify-center"><span className="text-2xl font-black text-[#faf6ef]">{profile?.charAt(0)}</span></div><div><div className="text-xl font-bold text-[#42392e]">{profile}</div><div className="text-sm text-[#857460]">팀 멤버</div></div></div></div><button onClick={logout} className="w-full py-3 bg-[#f0e9de] border border-[#d4c4ac] hover:border-[#9b4d4d] text-[#9b4d4d] rounded-xl text-sm font-bold flex items-center justify-center gap-2"><LogOut size={16} />로그아웃</button></div>
+            <div className="vj-card bg-[#faf6ef] rounded-2xl p-6 border border-[#d4c4ac]"><div className="flex items-center gap-2 mb-4"><Lock size={20} className="text-[#a0714a]" /><h3 className="text-lg font-bold text-[#42392e]">비밀번호 변경</h3></div>
+                <form onSubmit={handlePasswordChange} className="space-y-3">
+                    {[{ key: 'current', label: '현재 비밀번호' }, { key: 'next', label: '새 비밀번호' }, { key: 'confirm', label: '새 비밀번호 확인' }].map(({ key, label }) => (
+                        <div key={key}>
+                            <label className="block text-xs font-bold text-[#857460] mb-1">{label}</label>
+                            <div className="relative">
+                                <input
+                                    type={showPw[key] ? 'text' : 'password'}
+                                    value={pwForm[key]}
+                                    onChange={e => { setPwForm(prev => ({ ...prev, [key]: e.target.value })); setPwError(''); }}
+                                    placeholder={label}
+                                    className="w-full pr-10 pl-3 py-2.5 bg-white border border-[#d4c4ac] rounded-xl text-sm text-[#42392e] focus:outline-none focus:border-[#a0714a] focus:ring-2 focus:ring-[#a0714a]/20"
+                                />
+                                <button type="button" onClick={() => toggleShow(key)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#c4b49a] hover:text-[#857460]">
+                                    {showPw[key] ? <EyeOff size={14} /> : <Eye size={14} />}
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    {pwError && <p className="text-xs text-red-500 font-medium">{pwError}</p>}
+                    {pwSuccess && <p className="text-xs text-green-600 font-medium flex items-center gap-1"><Check size={12} />비밀번호가 변경되었습니다.</p>}
+                    <button type="submit" disabled={pwLoading || !pwForm.current || !pwForm.next || !pwForm.confirm} className="w-full py-2.5 vj-btn-primary text-[#faf6ef] font-bold rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-50">
+                        {pwLoading ? <><Loader size={14} className="animate-spin" />변경 중...</> : <><Lock size={14} />비밀번호 변경</>}
+                    </button>
+                </form>
+            </div>
             <div className="vj-card bg-[#faf6ef] rounded-2xl p-6 border border-[#d4c4ac]"><div className="flex items-center gap-2 mb-4"><Archive size={20} className="text-[#a0714a]" /><h3 className="text-lg font-bold text-[#42392e]">데이터 백업 / 복원</h3></div><p className="text-sm text-[#857460] mb-6 leading-relaxed">프로젝트, 일정, 재무 데이터를 안전하게 백업하고 복원할 수 있습니다.<br />백업 파일은 JSON 형식으로 저장됩니다.</p><div className="space-y-3"><button onClick={handleExport} disabled={isExporting} className="w-full py-3 vj-btn-primary text-[#faf6ef] font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">{isExporting ? (<><Loader size={16} className="animate-spin" />백업 중...</>) : (<><Archive size={16} />데이터 백업 (다운로드)</>)}</button><input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" /><button onClick={() => fileInputRef.current?.click()} disabled={isImporting} className="w-full py-3 bg-[#f0e9de] border-2 border-[#d4c4ac] text-[#42392e] font-bold rounded-xl text-sm flex items-center justify-center gap-2 hover:border-[#a0714a] transition-all disabled:opacity-50 disabled:cursor-not-allowed">{isImporting ? (<><Loader size={16} className="animate-spin" />복원 중...</>) : (<><Upload size={16} />데이터 복원 (업로드)</>)}</button></div><div className="mt-4 p-3 bg-[#a0714a]/10 border border-[#a0714a]/30 rounded-xl"><div className="flex gap-2"><AlertTriangle size={16} className="text-[#a0714a] flex-shrink-0 mt-0.5" /><div className="text-xs text-[#a0714a] leading-relaxed"><span className="font-bold">주의사항:</span><ul className="list-disc list-inside mt-1 space-y-0.5"><li>복원 시 기존 데이터는 유지되고 새 데이터가 추가됩니다.</li><li>중복 방지를 위해 복원 전 백업 파일 내용을 확인하세요.</li><li>정기적인 백업을 권장합니다 (주 1회 이상).</li></ul></div></div></div></div>
             <div className="vj-card bg-[#faf6ef] rounded-2xl p-6 border border-[#d4c4ac]"><div className="flex items-center gap-2 mb-4"><Zap size={20} className="text-[#a0714a]" /><h3 className="text-lg font-bold text-[#42392e]">예시 데이터</h3></div><p className="text-sm text-[#857460] mb-6 leading-relaxed">테스트용 예시 데이터를 생성하거나 삭제합니다.<br />제목에 <span className="font-bold text-[#42392e]">[예시]</span>가 포함된 항목만 삭제됩니다.</p><div className="flex gap-3"><button onClick={handleGenerateSample} disabled={isGenerating || isClearing} className="flex-1 py-3 vj-btn-primary text-[#faf6ef] font-bold rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-50">{isGenerating ? <Loader size={16} className="animate-spin" /> : <Zap size={16} />}{isGenerating ? '생성 중...' : '예시 데이터 생성'}</button><button onClick={handleClearSample} disabled={isGenerating || isClearing} className="flex-1 py-3 bg-[#f0e9de] border border-[#9b4d4d]/40 text-[#9b4d4d] font-bold rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-[#9b4d4d]/10 transition-all">{isClearing ? <Loader size={16} className="animate-spin" /> : <Trash size={16} />}{isClearing ? '삭제 중...' : '예시 데이터 삭제'}</button></div></div>
         </div>

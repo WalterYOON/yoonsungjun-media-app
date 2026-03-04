@@ -5,7 +5,8 @@ import {
   writeBatch, query, where, getDocs, orderBy, limit
 } from 'firebase/firestore';
 import {
-  getAuth, signInWithCustomToken, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  getAuth, signInWithCustomToken, signInAnonymously, signInWithEmailAndPassword, signOut,
+  updatePassword, reauthenticateWithCredential, EmailAuthProvider, onAuthStateChanged
 } from 'firebase/auth';
 
 const firebaseConfig = JSON.parse(__firebase_config);
@@ -18,5 +19,6 @@ export { app, auth, db, appId };
 export {
   collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc,
   writeBatch, query, where, getDocs, orderBy, limit,
-  signInWithCustomToken, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  signInWithCustomToken, signInAnonymously, signInWithEmailAndPassword, signOut,
+  updatePassword, reauthenticateWithCredential, EmailAuthProvider, onAuthStateChanged
 };
