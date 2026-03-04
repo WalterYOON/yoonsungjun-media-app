@@ -28,7 +28,7 @@ const ScheduleModal = () => {
     }, [modals.schedule, selectedItems.task, profile, selectedDate]);
     if (!modals.schedule) return null;
 
-    const handleCreate = (type) => { setTab(type === 'personal' ? 'personal' : 'work'); const defaultDate = selectedDate || formatDateLocal(new Date()); setFormData(prev => ({ ...prev, author: profile || DEFAULT_AUTHOR, category: type === 'personal' ? ['연차'] : ['대본'], details: '', status: type === 'personal' ? 'done' : 'in_progress', planId: type === 'task' && plans.length > 0 ? plans[0].id : '', type: type, workStartDate: defaultDate, workEndDate: defaultDate, completedDates: [] })); setMode('create'); };
+    const handleCreate = (type) => { setTab(type === 'personal' ? 'personal' : 'work'); const defaultDate = selectedDate || formatDateLocal(new Date()); setFormData(prev => ({ ...prev, author: profile || DEFAULT_AUTHOR, category: type === 'personal' ? ['연차'] : ['대본'], details: '', status: type === 'personal' ? 'done' : 'in_progress', planId: '', type: type, workStartDate: defaultDate, workEndDate: defaultDate, completedDates: [] })); setMode('create'); };
     const handleSaveInternal = async () => {
         setIsSaving(true);
         const result = await operations.saveTask({ ...formData, id: selectedItems.task?.id }, mode === 'edit', false, syncGroup);

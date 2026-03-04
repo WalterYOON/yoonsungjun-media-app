@@ -39,6 +39,25 @@ export const AUTHORS = ['윤성준', '이현경'];
 export const TEAM_MEMBERS = AUTHORS;
 export const DEFAULT_AUTHOR = AUTHORS[0];
 
+// 담당자별 캘린더 블록 배경색 (방식 1)
+export const MEMBER_COLORS = {
+    '윤성준': { bg: 'rgba(74, 122, 181, 0.75)', text: '#ffffff', hoverBg: 'rgba(74, 122, 181, 0.90)' },
+    '이현경': { bg: 'rgba(122, 90, 155, 0.75)', text: '#ffffff', hoverBg: 'rgba(122, 90, 155, 0.90)' },
+};
+export const MEMBER_COLORS_DEFAULT = { bg: 'rgba(100, 100, 100, 0.65)', text: '#ffffff', hoverBg: 'rgba(100,100,100,0.85)' };
+
+// 프로젝트 왼쪽 테두리 색상 팔레트 (planId 해시 → 인덱스)
+export const PROJECT_BORDER_COLORS = [
+    '#e07b4a', // 주황
+    '#5d9b5d', // 초록
+    '#b8860b', // 황금
+    '#9b4d4d', // 빨강
+    '#4a8a9b', // 청록
+    '#7a5d9b', // 보라
+    '#9b7a3d', // 갈색
+    '#4a7a6a', // 청녹
+];
+
 export const HOLIDAYS = {
     '2025-12-25': '성탄절', '2026-01-01': '신정', '2026-02-16': '설날 연휴', '2026-02-17': '설날',
     '2026-02-18': '설날 연휴', '2026-03-01': '3.1절', '2026-03-02': '대체공휴일(3.1절)',
