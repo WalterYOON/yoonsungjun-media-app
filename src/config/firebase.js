@@ -1,11 +1,11 @@
 // Firebase Imports
 import { initializeApp } from 'firebase/app';
-import { 
-  getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, 
+import {
+  getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc,
   writeBatch, query, where, getDocs, orderBy, limit
 } from 'firebase/firestore';
-import { 
-  getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged
+import {
+  getAuth, signInWithCustomToken, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged
 } from 'firebase/auth';
 
 const firebaseConfig = JSON.parse(__firebase_config);
@@ -15,8 +15,8 @@ const db = getFirestore(app);
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
 export { app, auth, db, appId };
-export { 
-  collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, 
+export {
+  collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc,
   writeBatch, query, where, getDocs, orderBy, limit,
-  signInWithCustomToken, signInAnonymously, onAuthStateChanged
+  signInWithCustomToken, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged
 };

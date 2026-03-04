@@ -39,6 +39,14 @@ export const AUTHORS = ['윤성준', '이현경'];
 export const TEAM_MEMBERS = AUTHORS;
 export const DEFAULT_AUTHOR = AUTHORS[0];
 
+// 로그인 계정 정보 (Firebase 이메일+비밀번호 인증용)
+export const TEAM_ACCOUNTS = [
+    { name: '윤성준', email: 'sungjun.yoon@fairplay142.com', avatar: '윤', color: 'bg-[#4a7ab5]' },
+    { name: '이현경', email: 'hyungyung.lee@fairplay142.com', avatar: '이', color: 'bg-[#7a5a9b]' },
+    { name: '강일훈', email: 'kgnsl1@fairplay142.com', avatar: '강', color: 'bg-[#5d7a5d]' },
+    { name: '이정주', email: 'jeongju.lee@fairplay142.com', avatar: '정', color: 'bg-[#a0714a]' },
+];
+
 // 담당자별 캘린더 블록 배경색 (방식 1)
 export const MEMBER_COLORS = {
     '윤성준': { bg: 'rgba(74, 122, 181, 0.75)', text: '#ffffff', hoverBg: 'rgba(74, 122, 181, 0.90)' },

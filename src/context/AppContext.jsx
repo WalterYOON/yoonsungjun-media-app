@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { db, appId, auth, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, writeBatch, query, where, getDocs, orderBy, limit, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from '../config/firebase';
+import { db, appId, auth, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, writeBatch, query, where, getDocs, orderBy, limit, signInWithEmailAndPassword, signOut, onAuthStateChanged } from '../config/firebase';
+import { TEAM_ACCOUNTS } from '../config/constants';
 import { SAMPLE_PLANS, SAMPLE_TASKS, SAMPLE_FINANCES, SAMPLE_INQUIRIES } from '../data/sampleData';
 import { formatDateLocal, getDaysDifference, changeDate, parseLocalDate, isHolidayOrWeekend, getDatesInRange, getWeekDays } from '../utils/dateUtils';
 import { validateTask, validatePlan, validateManagement, validateBackupFile } from '../utils/validation';
@@ -24,7 +25,7 @@ export const AppProvider = ({ children }) => {
     const [tasks, setTasks] = useState(SAMPLE_TASKS);
     const [logs, setLogs] = useState([]);
     const [managements, setManagements] = useState([...SAMPLE_FINANCES, ...SAMPLE_INQUIRIES]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [viewMode, setViewMode] = useState('month');
     const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -39,16 +40,21 @@ export const AppProvider = ({ children }) => {
     const today = useCallback(() => setCurrentDate(new Date()), []);
 
     useEffect(() => {
-        const initAuth = async () => { if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } };
-        initAuth();
-        const unsubscribe = onAuthStateChanged(auth, setUser);
+        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+            setUser(firebaseUser);
+            if (firebaseUser) {
+                // 이메일로 팀원 이름 자동 매핑
+                const account = TEAM_ACCOUNTS.find(a => a.email === firebaseUser.email);
+                setProfile(account ? account.name : (firebaseUser.email || '사용자'));
+            } else {
+                setProfile(null);
+            }
+        });
         return () => unsubscribe();
     }, []);
 
     useEffect(() => {
         if (!user) return;
-        const savedProfile = localStorage.getItem('weekly_report_user_name');
-        if (savedProfile) setProfile(savedProfile);
 
         const baseRef = doc(db, 'artifacts', appId, 'public', 'data');
         const plansQuery = collection(baseRef, 'weekly_plans_live');
@@ -92,8 +98,8 @@ export const AppProvider = ({ children }) => {
         return () => { unsubPlans(); unsubTasks(); unsubLogs(); unsubMgmt(); };
     }, [user]);
 
-    const handleSetProfile = useCallback((name) => { setProfile(name); localStorage.setItem('weekly_report_user_name', name); }, []);
-    const logout = useCallback(() => { localStorage.removeItem('weekly_report_user_name'); window.location.reload(); }, []);
+    const handleSetProfile = useCallback((name) => { setProfile(name); }, []);
+    const logout = useCallback(async () => { await signOut(auth); }, []);
     const logActivity = useCallback(async (type, message) => { if (!profile) return; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'weekly_logs'), { type, message, user: profile, createdAt: new Date().toISOString() }); }, [profile]);
 
     const exportAllData = useCallback(async () => {
