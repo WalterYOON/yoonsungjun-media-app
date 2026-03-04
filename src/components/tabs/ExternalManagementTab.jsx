@@ -5,7 +5,7 @@ import { Plus, DollarSign, ShoppingBag, Mail, Search, Download, Edit, ExternalLi
 import { useApp } from '../../context/AppContext';
 import { INQUIRY_CATEGORIES } from '../../config/constants';
 import { formatDateLocal, parseLocalDate } from '../../utils/dateUtils';
-import { useDebounce } from '../../hooks/useDebounce';
+import useDebounce from '../../hooks/useDebounce';
 
 // FinanceSplitView
 const FinanceSplitView = ({ filteredItems, plans, onItemClick }) => {
