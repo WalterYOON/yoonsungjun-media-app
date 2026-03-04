@@ -70,26 +70,59 @@ const SettingsTab = () => {
         setIsGenerating(true);
         try {
             const draftPlans = [
-                { topic: '[예시] 여름 패션 하울', type: 'main', status: 'draft', planner: TEAM_MEMBERS[0], description: '여름 신상 의류 리뷰', uploadDate: rndDate(7, 14) },
-                { topic: '[예시] 먹방 챌린지 숏츠', type: 'shorts', status: 'draft', planner: TEAM_MEMBERS[1] || TEAM_MEMBERS[0], description: '인기 음식 챌린지', uploadDate: rndDate(5, 10) },
+                { topic: '[예시] 여름 패션 하울', type: 'main', status: 'draft', planner: TEAM_MEMBERS[0], description: '여름 신상 의류 리뷰', uploadDate: rndDate(7, 14), isSample: true },
+                { topic: '[예시] 먹방 챌린지 숏츠', type: 'shorts', status: 'draft', planner: TEAM_MEMBERS[1] || TEAM_MEMBERS[0], description: '인기 음식 챌린지', uploadDate: rndDate(5, 10), isSample: true },
             ];
             const activePlans = [
-                { topic: '[예시] 제주도 여행 브이로그', type: 'main', status: 'active', planner: TEAM_MEMBERS[0], description: '제주도 여행 기록', uploadDate: rndDate(3, 7) },
-                { topic: '[예시] 게임 리뷰 특집', type: 'main', status: 'active', planner: TEAM_MEMBERS[1] || TEAM_MEMBERS[0], description: '2026 기대작 TOP5', uploadDate: rndDate(2, 5) },
+                { topic: '[예시] 제주도 여행 브이로그', type: 'main', status: 'active', planner: TEAM_MEMBERS[0], description: '제주도 여행 기록', uploadDate: rndDate(3, 7), isSample: true },
+                { topic: '[예시] 게임 리뷰 특집', type: 'main', status: 'active', planner: TEAM_MEMBERS[1] || TEAM_MEMBERS[0], description: '2026 기대작 TOP5', uploadDate: rndDate(2, 5), isSample: true },
             ];
             const createdActiveIds = [];
             for (const plan of [...draftPlans, ...activePlans]) { const result = await operations.savePlan(plan); if (result?.success && result?.id && plan.status === 'active') { createdActiveIds.push({ id: result.id, topic: plan.topic }); } }
-            for (const { id: planId, topic } of createdActiveIds) { const tasks = [{ details: '[예시] 대본 작성', type: 'task', category: ['대본'], author: TEAM_MEMBERS[0], workStartDate: rndDate(-3, -1), workEndDate: rndDate(0, 1), status: 'done', planId, completedDates: [], topic, skipPlanCheck: true }, { details: '[예시] 촬영', type: 'task', category: ['촬영'], author: TEAM_MEMBERS[0], workStartDate: rndDate(1, 2), workEndDate: rndDate(3, 4), status: 'in_progress', planId, completedDates: [], topic, skipPlanCheck: true }, { details: '[예시] 편집', type: 'task', category: ['편집'], author: TEAM_MEMBERS[1] || TEAM_MEMBERS[0], workStartDate: rndDate(4, 5), workEndDate: rndDate(6, 8), status: 'todo', planId, completedDates: [], topic, skipPlanCheck: true },]; for (const task of tasks) { await operations.saveTask(task, false, false, false); } }
-            const finances = [{ type: 'income', title: '[예시] 브랜드 협찬비', amount: 1500000, datetime: rndDate(-10, -5), memo: 'A브랜드 협찬' }, { type: 'income', title: '[예시] 유튜브 광고 수익', amount: 820000, datetime: rndDate(-7, -3), memo: '월 광고 수익' }, { type: 'income', title: '[예시] 슈퍼챗 수익', amount: 350000, datetime: rndDate(-5, -1), memo: '라이브 방송' }, { type: 'expense', title: '[예시] 스튜디오 대여비', amount: 300000, datetime: rndDate(-8, -4), memo: '월 정기 대여' }, { type: 'expense', title: '[예시] 카메라 장비 구매', amount: 450000, datetime: rndDate(-6, -2), memo: '촬영 장비' }, { type: 'expense', title: '[예시] 편집 외주비', amount: 200000, datetime: rndDate(-4, -1), memo: '숏폼 편집' },];
+            for (const { id: planId, topic } of createdActiveIds) { const tasks = [{ details: '[예시] 대본 작성', type: 'task', category: ['대본'], author: TEAM_MEMBERS[0], workStartDate: rndDate(-3, -1), workEndDate: rndDate(0, 1), status: 'done', planId, completedDates: [], topic, skipPlanCheck: true, isSample: true }, { details: '[예시] 촬영', type: 'task', category: ['촬영'], author: TEAM_MEMBERS[0], workStartDate: rndDate(1, 2), workEndDate: rndDate(3, 4), status: 'in_progress', planId, completedDates: [], topic, skipPlanCheck: true, isSample: true }, { details: '[예시] 편집', type: 'task', category: ['편집'], author: TEAM_MEMBERS[1] || TEAM_MEMBERS[0], workStartDate: rndDate(4, 5), workEndDate: rndDate(6, 8), status: 'todo', planId, completedDates: [], topic, skipPlanCheck: true, isSample: true },]; for (const task of tasks) { await operations.saveTask(task, false, false, false); } }
+            const finances = [{ type: 'income', title: '[예시] 브랜드 협찬비', amount: 1500000, datetime: rndDate(-10, -5), memo: 'A브랜드 협찬', isSample: true }, { type: 'income', title: '[예시] 유튜브 광고 수익', amount: 820000, datetime: rndDate(-7, -3), memo: '월 광고 수익', isSample: true }, { type: 'income', title: '[예시] 슈퍼챗 수익', amount: 350000, datetime: rndDate(-5, -1), memo: '라이브 방송', isSample: true }, { type: 'expense', title: '[예시] 스튜디오 대여비', amount: 300000, datetime: rndDate(-8, -4), memo: '월 정기 대여', isSample: true }, { type: 'expense', title: '[예시] 카메라 장비 구매', amount: 450000, datetime: rndDate(-6, -2), memo: '촬영 장비', isSample: true }, { type: 'expense', title: '[예시] 편집 외주비', amount: 200000, datetime: rndDate(-4, -1), memo: '숏폼 편집', isSample: true },];
             for (const item of finances) { await operations.saveManagement(item, 'finance'); }
-            const inquiries = [{ type: 'sponsor', sender: '[예시] A패션브랜드', subject: 'S/S 협찬 제안', content: '봄/여름 시즌 협찬을 제안드립니다.', receivedDate: rndDate(-7, -3) }, { type: 'partnership', sender: '[예시] B엔터테인먼트', subject: 'MCN 파트너십 논의', content: '크리에이터 파트너십 미팅을 요청드립니다.', receivedDate: rndDate(-5, -2) }, { type: 'inquiry', sender: '[예시] 일반 구독자', subject: '촬영 장비 문의', content: '사용하시는 카메라가 궁금합니다.', receivedDate: rndDate(-3, -1) },];
+            const inquiries = [{ type: 'sponsor', sender: '[예시] A패션브랜드', subject: 'S/S 협찬 제안', content: '봄/여름 시즌 협찬을 제안드립니다.', receivedDate: rndDate(-7, -3), isSample: true }, { type: 'partnership', sender: '[예시] B엔터테인먼트', subject: 'MCN 파트너십 논의', content: '크리에이터 파트너십 미팅을 요청드립니다.', receivedDate: rndDate(-5, -2), isSample: true }, { type: 'inquiry', sender: '[예시] 일반 구독자', subject: '촬영 장비 문의', content: '사용하시는 카메라가 궁금합니다.', receivedDate: rndDate(-3, -1), isSample: true },];
             for (const item of inquiries) { await operations.saveManagement(item, 'inquiry'); }
             showToast('예시 데이터가 생성되었습니다.', 'success');
         } catch (e) { console.error(e); showToast('생성 중 오류가 발생했습니다.', 'error'); }
         setIsGenerating(false);
     };
 
-    const handleClearSample = () => { openConfirm('[예시] 데이터를 모두 삭제하시겠습니까?', async () => { setIsClearing(true); try { const baseRef = (col) => collection(db, 'artifacts', appId, 'public', 'data', col); const plansSnap = await getDocs(baseRef('weekly_plans_live')); const plansBatch = writeBatch(db); plansSnap.docs.filter(d => d.data().topic?.includes('[예시]')).forEach(d => plansBatch.delete(d.ref)); await plansBatch.commit(); const tasksSnap = await getDocs(baseRef('weekly_schedule_live')); const tasksBatch = writeBatch(db); tasksSnap.docs.filter(d => d.data().details?.includes('[예시]')).forEach(d => tasksBatch.delete(d.ref)); await tasksBatch.commit(); const mgmtSnap = await getDocs(baseRef('weekly_management')); const mgmtBatch = writeBatch(db); mgmtSnap.docs.filter(d => d.data().title?.includes('[예시]') || d.data().sender?.includes('[예시]')).forEach(d => mgmtBatch.delete(d.ref)); await mgmtBatch.commit(); showToast('예시 데이터가 삭제되었습니다.', 'success'); } catch (e) { console.error(e); showToast('삭제 중 오류가 발생했습니다.', 'error'); } setIsClearing(false); }); };
+    const isSampleDoc = (d) => {
+        const data = d.data();
+        return data.isSample === true
+            || data.topic?.includes('[예시]')
+            || data.details?.includes('[예시]')
+            || data.title?.includes('[예시]')
+            || data.sender?.includes('[예시]')
+            || data.subject?.includes('[예시]');
+    };
+
+    const handleClearSample = () => {
+        openConfirm('[예시] 데이터를 모두 삭제하시겠습니까?', async () => {
+            setIsClearing(true); try {
+                const baseRef = (col) => collection(db, 'artifacts', appId, 'public', 'data', col);
+                // 1. 예시 플랜 삭제 & 삭제된 planId 수집 (cascade용)
+                const plansSnap = await getDocs(baseRef('weekly_plans_live'));
+                const samplePlanIds = new Set();
+                const plansBatch = writeBatch(db);
+                plansSnap.docs.forEach(d => { if (isSampleDoc(d)) { samplePlanIds.add(d.id); plansBatch.delete(d.ref); } });
+                await plansBatch.commit();
+                // 2. 예시 일정 삭제: isSample 플래그 OR [예시] 텍스트 OR 삭제된 플랜에 연결된 항목
+                const tasksSnap = await getDocs(baseRef('weekly_schedule_live'));
+                const tasksBatch = writeBatch(db);
+                tasksSnap.docs.forEach(d => { if (isSampleDoc(d) || samplePlanIds.has(d.data().planId)) { tasksBatch.delete(d.ref); } });
+                await tasksBatch.commit();
+                // 3. 재무/문의 삭제
+                const mgmtSnap = await getDocs(baseRef('weekly_management'));
+                const mgmtBatch = writeBatch(db);
+                mgmtSnap.docs.forEach(d => { if (isSampleDoc(d)) { mgmtBatch.delete(d.ref); } });
+                await mgmtBatch.commit();
+                showToast('예시 데이터가 삭제되었습니다.', 'success');
+            } catch (e) { console.error(e); showToast('삭제 중 오류가 발생했습니다.', 'error'); } setIsClearing(false);
+        });
+    };
 
     return (
         <div className="max-w-2xl mx-auto space-y-4">
