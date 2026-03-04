@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Settings, LogOut, Archive, Upload, Loader, AlertTriangle, Zap, Trash, Lock, Eye, EyeOff, Check } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TEAM_MEMBERS } from '../../config/constants';
+import { SAMPLE_PLANS, SAMPLE_TASKS, SAMPLE_FINANCES, SAMPLE_INQUIRIES } from '../../data/sampleData';
 import { formatDateLocal } from '../../utils/dateUtils';
 import { collection, getDocs, writeBatch } from 'firebase/firestore';
 import { db, appId, auth } from '../../config/firebase';
@@ -128,6 +129,7 @@ const SettingsTab = () => {
         openConfirm('⚠️ 전체 데이터를 초기화하시겠습니까?\n\n플랜, 일정, 재무, 문의 데이터가 모두 삭제됩니다.\n이 작업은 되돌릴 수 없습니다.', async () => {
             setIsClearing(true);
             try {
+                // 1. Firebase 전체 삭제
                 const baseRef = (col) => collection(db, 'artifacts', appId, 'public', 'data', col);
                 const collections = ['weekly_plans_live', 'weekly_schedule_live', 'weekly_management'];
                 for (const col of collections) {
@@ -136,6 +138,16 @@ const SettingsTab = () => {
                     snap.docs.forEach(d => batch.delete(d.ref));
                     await batch.commit();
                 }
+                // 2. 하드코딩 샘플 데이터 숨기기 (localStorage 삭제된 ID 등록)
+                const allPlanIds = SAMPLE_PLANS.map(p => p.id);
+                const allTaskIds = SAMPLE_TASKS.map(t => t.id);
+                const allMgmtIds = [...SAMPLE_FINANCES, ...SAMPLE_INQUIRIES].map(m => m.id);
+                localStorage.setItem('deleted_sample_plans', JSON.stringify(allPlanIds));
+                localStorage.setItem('deleted_sample_tasks', JSON.stringify(allTaskIds));
+                localStorage.setItem('deleted_sample_mgmt', JSON.stringify(allMgmtIds));
+                localStorage.removeItem('modified_sample_plans');
+                localStorage.removeItem('modified_sample_tasks');
+                localStorage.removeItem('modified_sample_mgmt');
                 showToast('전체 데이터가 초기화되었습니다.', 'success');
             } catch (e) { console.error(e); showToast('초기화 중 오류가 발생했습니다.', 'error'); }
             setIsClearing(false);
