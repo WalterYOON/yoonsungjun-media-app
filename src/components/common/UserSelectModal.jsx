@@ -97,9 +97,9 @@ const UserSelectModal = () => {
                                     onChange={(e) => { setIdPrefix(e.target.value.replace(/\s/g, '')); setError(''); }}
                                     placeholder="예: sungjun.yoon"
                                     autoComplete="username"
-                                    className="flex-1 pl-4 py-3.5 bg-transparent text-base text-[#42392e] focus:outline-none"
+                                    className="min-w-0 flex-1 pl-4 py-3.5 bg-transparent text-base text-[#42392e] focus:outline-none"
                                 />
-                                <span className="pr-4 text-base text-[#a0714a] font-semibold whitespace-nowrap select-none">
+                                <span className="flex-shrink-0 px-3 text-base text-[#a0714a] font-semibold whitespace-nowrap select-none">
                                     {DOMAIN}
                                 </span>
                             </div>
@@ -141,8 +141,8 @@ const UserSelectModal = () => {
                             <label className="flex items-center gap-2 cursor-pointer select-none group">
                                 <div
                                     className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${rememberMe
-                                            ? 'bg-[#a0714a] border-[#a0714a]'
-                                            : 'bg-white border-[#d4c4ac] group-hover:border-[#a0714a]'
+                                        ? 'bg-[#a0714a] border-[#a0714a]'
+                                        : 'bg-white border-[#d4c4ac] group-hover:border-[#a0714a]'
                                         }`}
                                     onClick={() => setRememberMe(v => !v)}
                                 >
