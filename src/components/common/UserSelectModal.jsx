@@ -140,11 +140,10 @@ const UserSelectModal = () => {
                         <div className="flex items-center mb-6">
                             <label className="flex items-center gap-2 cursor-pointer select-none group">
                                 <div
-                                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${rememberMe
+                                    className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0 ${rememberMe
                                         ? 'bg-[#a0714a] border-[#a0714a]'
                                         : 'bg-white border-[#d4c4ac] group-hover:border-[#a0714a]'
                                         }`}
-                                    onClick={() => setRememberMe(v => !v)}
                                 >
                                     {rememberMe && (
                                         <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
@@ -163,6 +162,7 @@ const UserSelectModal = () => {
                                 </span>
                             </label>
                         </div>
+
 
                         {/* 로그인 버튼 */}
                         <button

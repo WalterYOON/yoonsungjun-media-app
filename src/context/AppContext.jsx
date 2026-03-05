@@ -80,35 +80,17 @@ export const AppProvider = ({ children }) => {
 
         const unsubPlans = onSnapshot(plansQuery, (snap) => {
             const firebaseData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            const localModifiedPlans = JSON.parse(localStorage.getItem('modified_sample_plans') || '{}');
-            const deletedSamplePlans = JSON.parse(localStorage.getItem('deleted_sample_plans') || '[]');
-            const baseSamplePlans = SAMPLE_PLANS
-                .filter(sp => !deletedSamplePlans.includes(sp.id))
-                .map(sp => localModifiedPlans[sp.id] ? { ...sp, ...localModifiedPlans[sp.id] } : sp);
-            const mergedPlans = [...baseSamplePlans.filter(sp => !firebaseData.some(fp => fp.id === sp.id)), ...firebaseData];
-            setPlans(mergedPlans.sort((a, b) => new Date(b.uploadDate || 0) - new Date(a.uploadDate || 0)));
+            setPlans(firebaseData.sort((a, b) => new Date(b.uploadDate || 0) - new Date(a.uploadDate || 0)));
         });
         const unsubTasks = onSnapshot(tasksQuery, (snap) => {
             const firebaseData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            const localModifiedTasks = JSON.parse(localStorage.getItem('modified_sample_tasks') || '{}');
-            const deletedSampleTasks = JSON.parse(localStorage.getItem('deleted_sample_tasks') || '[]');
-            const baseSampleTasks = SAMPLE_TASKS
-                .filter(st => !deletedSampleTasks.includes(st.id))
-                .map(st => localModifiedTasks[st.id] ? { ...st, ...localModifiedTasks[st.id] } : st);
-            const mergedTasks = [...baseSampleTasks.filter(st => !firebaseData.some(ft => ft.id === st.id)), ...firebaseData];
-            setTasks(mergedTasks);
+            setTasks(firebaseData);
             setLoading(false);
         });
         const unsubLogs = onSnapshot(logsQuery, (snap) => { setLogs(snap.docs.map(d => ({ id: d.id, ...d.data() }))); });
         const unsubMgmt = onSnapshot(mgmtQuery, (snap) => {
             const firebaseData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            const localModifiedMgmt = JSON.parse(localStorage.getItem('modified_sample_mgmt') || '{}');
-            const deletedSampleMgmt = JSON.parse(localStorage.getItem('deleted_sample_mgmt') || '[]');
-            const sampleMgmt = [...SAMPLE_FINANCES, ...SAMPLE_INQUIRIES]
-                .filter(sm => !deletedSampleMgmt.includes(sm.id))
-                .map(sm => localModifiedMgmt[sm.id] ? { ...sm, ...localModifiedMgmt[sm.id] } : sm);
-            const mergedMgmt = [...sampleMgmt.filter(sm => !firebaseData.some(fm => fm.id === sm.id)), ...firebaseData];
-            setManagements(mergedMgmt.sort((a, b) => new Date(b.datetime || b.receivedDate || 0) - new Date(a.datetime || a.receivedDate || 0)));
+            setManagements(firebaseData.sort((a, b) => new Date(b.datetime || b.receivedDate || 0) - new Date(a.datetime || a.receivedDate || 0)));
         });
 
         return () => { unsubPlans(); unsubTasks(); unsubLogs(); unsubMgmt(); };
@@ -196,14 +178,6 @@ export const AppProvider = ({ children }) => {
 
         const deleteTask = async (id, topic, groupId = null) => {
             if (!user) return false;
-            const isSampleTask = id && id.startsWith('task-');
-            if (isSampleTask) {
-                setTasks(prev => prev.filter(t => t.id !== id));
-                const deletedSampleTasks = JSON.parse(localStorage.getItem('deleted_sample_tasks') || '[]');
-                if (!deletedSampleTasks.includes(id)) { deletedSampleTasks.push(id); localStorage.setItem('deleted_sample_tasks', JSON.stringify(deletedSampleTasks)); }
-                showToast(`'${topic || '일정'}' 삭제됨`, 'success');
-                return true;
-            }
             try {
                 await retryWithBackoff(async () => {
                     if (groupId) {
@@ -230,14 +204,6 @@ export const AppProvider = ({ children }) => {
             try {
                 const rawPayload = { ...planData, status: planData.status || 'draft' };
                 const payload = Object.fromEntries(Object.entries(rawPayload).filter(([_, v]) => v !== undefined));
-                const isSamplePlan = payload.id && payload.id.startsWith('plan-');
-                if (isSamplePlan) {
-                    setPlans(prev => prev.map(p => p.id === payload.id ? { ...p, ...payload } : p));
-                    const localModifiedPlans = JSON.parse(localStorage.getItem('modified_sample_plans') || '{}');
-                    localModifiedPlans[payload.id] = payload;
-                    localStorage.setItem('modified_sample_plans', JSON.stringify(localModifiedPlans));
-                    return { success: true, id: payload.id };
-                }
                 let resultId = null;
                 await retryWithBackoff(async () => {
                     if (payload.id) {
@@ -264,14 +230,6 @@ export const AppProvider = ({ children }) => {
             if (!validation.valid) { showToast(validation.message, 'error'); return false; }
             try {
                 const cleanData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined));
-                const isSampleData = cleanData.id && (cleanData.id.startsWith('fin-') || cleanData.id.startsWith('inq-'));
-                if (isSampleData) {
-                    setManagements(prev => prev.map(m => m.id === cleanData.id ? { ...m, ...cleanData } : m));
-                    const localModifiedMgmt = JSON.parse(localStorage.getItem('modified_sample_mgmt') || '{}');
-                    localModifiedMgmt[cleanData.id] = cleanData;
-                    localStorage.setItem('modified_sample_mgmt', JSON.stringify(localModifiedMgmt));
-                    return true;
-                }
                 await retryWithBackoff(async () => {
                     if (cleanData.id) {
                         const { id, ...updateData } = cleanData;
@@ -287,14 +245,6 @@ export const AppProvider = ({ children }) => {
         };
 
         const deleteManagement = async (id) => {
-            const isSampleData = id && (id.startsWith('fin-') || id.startsWith('inq-'));
-            if (isSampleData) {
-                setManagements(prev => prev.filter(m => m.id !== id));
-                const deletedSampleMgmt = JSON.parse(localStorage.getItem('deleted_sample_mgmt') || '[]');
-                if (!deletedSampleMgmt.includes(id)) { deletedSampleMgmt.push(id); localStorage.setItem('deleted_sample_mgmt', JSON.stringify(deletedSampleMgmt)); }
-                showToast('삭제되었습니다.', 'success');
-                return true;
-            }
             try {
                 await retryWithBackoff(async () => { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'weekly_management', id)); }, { context: 'deleteManagement' });
                 return true;
