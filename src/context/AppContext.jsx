@@ -40,13 +40,26 @@ export const AppProvider = ({ children }) => {
     const today = useCallback(() => setCurrentDate(new Date()), []);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        // 세션 가드: 브라우저 탭을 닫고 새로 열면 자동 로그아웃
+        // sessionStorage는 탭을 닫으면 지워지므로, 마커가 없으면 새 브라우저 세션
+        const SESSION_KEY = 'fp_session_active';
+        const isNewSession = !sessionStorage.getItem(SESSION_KEY);
+
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+            if (firebaseUser && isNewSession) {
+                // 새 브라우저 세션인데 Firebase가 캐시된 사용자를 복원한 경우 → 강제 로그아웃
+                await signOut(auth);
+                return;
+            }
             setUser(firebaseUser);
             if (firebaseUser) {
+                // 유효한 세션 마커 설정
+                sessionStorage.setItem(SESSION_KEY, '1');
                 // 이메일로 팀원 이름 자동 매핑
                 const account = TEAM_ACCOUNTS.find(a => a.email === firebaseUser.email);
                 setProfile(account ? account.name : (firebaseUser.email || '사용자'));
             } else {
+                sessionStorage.removeItem(SESSION_KEY);
                 setProfile(null);
             }
         });
