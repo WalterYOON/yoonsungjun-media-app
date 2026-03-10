@@ -1,5 +1,5 @@
 // MainLayout - 원본 라인 4044~4081
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Calendar as CalendarIcon, Film, Briefcase, Settings, Loader } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import VintageStyles from '../../styles/VintageStyles';
@@ -25,8 +25,21 @@ const MAIN_TABS = [
 ];
 
 const MainLayout = () => {
-    const { profile, loading } = useApp();
+    const { profile, loading, modals, toggleModal } = useApp();
     const [mainTab, setMainTab] = useState('dashboard');
+
+    // Esc 키로 열린 모달 닫기
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key !== 'Escape') return;
+            // 우선순위 순으로 열린 모달 닫기
+            const priority = ['schedule', 'plan', 'finance', 'inquiry', 'external', 'report', 'detail', 'search', 'memberDetail', 'thumbnail'];
+            const openModal = priority.find(key => modals[key]);
+            if (openModal) toggleModal(openModal, false);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [modals, toggleModal]);
 
     if (loading) return (<div className="min-h-screen vj-texture flex items-center justify-center"><Loader className="animate-spin text-[#a0714a]" size={48} /></div>);
     if (!profile) return <><VintageStyles /><UserSelectModal /></>;
