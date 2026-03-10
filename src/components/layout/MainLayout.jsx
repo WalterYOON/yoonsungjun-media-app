@@ -54,7 +54,7 @@ const MainLayout = () => {
                     <div className="flex items-center justify-between py-4">
                         <div className="flex items-center gap-4"><div className="w-14 h-14 bg-gradient-to-br from-[#a0714a] to-[#8a5d3a] rounded-xl flex items-center justify-center shadow-md"><Film size={26} className="text-[#faf6ef]" /></div><div><h1 className="text-3xl font-black text-[#42392e]">주간 업무 리포트</h1><p className="text-sm text-[#857460]">팀 업무 현황 통합 관리 · <span className="text-[#a0714a] font-bold">{profile}</span></p></div></div>
                     </div>
-                    <div className="flex">{MAIN_TABS.map(tab => { const Icon = tab.icon; const isActive = mainTab === tab.key; return (<button key={tab.key} onClick={() => setMainTab(tab.key)} className={`flex-1 py-5 text-base font-bold rounded-t-xl flex items-center justify-center gap-2 transition-all ${isActive ? 'bg-[#f0e9de] text-[#a0714a] border-t-2 border-x border-[#a0714a] border-[#d4c4ac]' : 'text-[#857460] hover:text-[#42392e] hover:bg-[#f5f0e6]'}`}><Icon size={19} /> {tab.label}</button>); })}</div>
+                    <div className="flex">{MAIN_TABS.map(tab => { const Icon = tab.icon; const isActive = mainTab === tab.key; return (<button key={tab.key} onClick={() => setMainTab(tab.key)} className={`flex-1 py-6 text-lg font-bold rounded-t-xl flex items-center justify-center gap-2.5 transition-all ${isActive ? 'bg-[#f0e9de] text-[#a0714a] border-t-2 border-x border-[#a0714a] border-[#d4c4ac]' : 'text-[#857460] hover:text-[#42392e] hover:bg-[#f5f0e6]'}`}><Icon size={21} /> {tab.label}</button>); })}</div>
                 </div>
             </header>
             <main className="max-w-[1600px] mx-auto p-6">
