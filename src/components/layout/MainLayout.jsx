@@ -52,9 +52,9 @@ const MainLayout = () => {
             <header className="vj-card border-b border-[#d4c4ac] sticky top-0 z-50">
                 <div className="max-w-[1600px] mx-auto px-6">
                     <div className="flex items-center justify-between py-4">
-                        <div className="flex items-center gap-3"><div className="w-10 h-10 bg-gradient-to-br from-[#a0714a] to-[#8a5d3a] rounded-xl flex items-center justify-center shadow-md"><Film size={20} className="text-[#faf6ef]" /></div><div><h1 className="text-xl font-black text-[#42392e]">주간 업무 리포트</h1><p className="text-xs text-[#857460]">팀 업무 현황 통합 관리 · <span className="text-[#a0714a] font-bold">{profile}</span></p></div></div>
+                        <div className="flex items-center gap-3"><div className="w-12 h-12 bg-gradient-to-br from-[#a0714a] to-[#8a5d3a] rounded-xl flex items-center justify-center shadow-md"><Film size={22} className="text-[#faf6ef]" /></div><div><h1 className="text-2xl font-black text-[#42392e]">주간 업무 리포트</h1><p className="text-sm text-[#857460]">팀 업무 현황 통합 관리 · <span className="text-[#a0714a] font-bold">{profile}</span></p></div></div>
                     </div>
-                    <div className="flex gap-1">{MAIN_TABS.map(tab => { const Icon = tab.icon; const isActive = mainTab === tab.key; return (<button key={tab.key} onClick={() => setMainTab(tab.key)} className={`px-5 py-3 text-sm font-bold rounded-t-xl flex items-center gap-2 transition-all ${isActive ? 'bg-[#f0e9de] text-[#a0714a] border-t-2 border-x border-[#a0714a] border-[#d4c4ac]' : 'text-[#857460] hover:text-[#42392e] hover:bg-[#f5f0e6]'}`}><Icon size={16} /> {tab.label}</button>); })}</div>
+                    <div className="flex gap-1">{MAIN_TABS.map(tab => { const Icon = tab.icon; const isActive = mainTab === tab.key; return (<button key={tab.key} onClick={() => setMainTab(tab.key)} className={`px-6 py-3.5 text-sm font-bold rounded-t-xl flex items-center gap-2 transition-all ${isActive ? 'bg-[#f0e9de] text-[#a0714a] border-t-2 border-x border-[#a0714a] border-[#d4c4ac]' : 'text-[#857460] hover:text-[#42392e] hover:bg-[#f5f0e6]'}`}><Icon size={17} /> {tab.label}</button>); })}</div>
                 </div>
             </header>
             <main className="max-w-[1600px] mx-auto p-6">
