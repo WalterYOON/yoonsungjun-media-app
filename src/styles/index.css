@@ -13,3 +13,10 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* RichTextEditor: contentEditable placeholder */
+[contenteditable][data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: #b0a090;
+  pointer-events: none;
+}

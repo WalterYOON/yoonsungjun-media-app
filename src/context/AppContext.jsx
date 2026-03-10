@@ -400,7 +400,7 @@ export const AppProvider = ({ children }) => {
             },
             deleteTask, savePlan, deletePlan, saveManagement, deleteManagement, exportAllData, importAllData
         };
-    }, [user, plans, profile, logActivity, showToast, openConfirm, exportAllData]);
+    }, [user, plans, tasks, profile, logActivity, showToast, openConfirm, exportAllData]);
 
     const filteredTasks = useMemo(() => {
         return tasks.filter(t => {

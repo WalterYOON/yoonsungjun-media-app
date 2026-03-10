@@ -77,5 +77,3 @@ export const isHolidayOrWeekend = (dateStr) => {
     if (HOLIDAYS[dateStr]) return true;
     return false;
 };
-
-export const generateGroupId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);

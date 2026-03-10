@@ -66,7 +66,17 @@ export const TaskBar = React.memo(({ task, plans, isPersonal, onClick }) => {
         </div>
     );
 }, (prev, next) => {
-    return prev.task.id === next.task.id && prev.task.status === next.task.status && prev.task.author === next.task.author && prev.task.planId === next.task.planId && prev.task.category?.[0] === next.task.category?.[0] && prev.task.workStartDate === next.task.workStartDate && prev.task.workEndDate === next.task.workEndDate && prev.task.completedDates?.length === next.task.completedDates?.length && prev.plans.length === next.plans.length;
+    const prevPlan = prev.plans.find(p => p.id === prev.task.planId);
+    const nextPlan = next.plans.find(p => p.id === next.task.planId);
+    return prev.task.id === next.task.id &&
+        prev.task.status === next.task.status &&
+        prev.task.author === next.task.author &&
+        prev.task.planId === next.task.planId &&
+        prev.task.category?.[0] === next.task.category?.[0] &&
+        prev.task.workStartDate === next.task.workStartDate &&
+        prev.task.workEndDate === next.task.workEndDate &&
+        prev.task.completedDates?.length === next.task.completedDates?.length &&
+        prevPlan?.status === nextPlan?.status;
 });
 
 // PlanCard
