@@ -12,7 +12,7 @@ export const Toast = () => {
         }
     }, [toastKey, hideToast]);
     if (!toast) return null;
-    return (<div className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-[200] flex items-center gap-3 px-6 py-3 shadow-xl rounded-full animate-in fade-in slide-in-from-top-4 duration-300 ${toast.type === 'error' ? 'bg-[#faf6ef] border border-[#9b4d4d]/40 text-[#8b3d3d]' : 'bg-[#4a3d30] text-[#faf6ef]'}`}>{toast.type === 'error' ? <AlertTriangle size={20} /> : <CheckCircle size={20} />}<span className="font-medium text-sm tracking-wide">{toast.message}</span></div>);
+    return (<div className={`fixed bottom-6 right-6 z-[200] flex items-center gap-3 px-6 py-3 shadow-xl rounded-full animate-in fade-in slide-in-from-bottom-4 duration-300 ${toast.type === 'error' ? 'bg-[#faf6ef] border border-[#9b4d4d]/40 text-[#8b3d3d]' : 'bg-[#4a3d30] text-[#faf6ef]'}`}>{toast.type === 'error' ? <AlertTriangle size={20} /> : <CheckCircle size={20} />}<span className="font-medium text-sm tracking-wide">{toast.message}</span></div>);
 };
 
 export const LogItem = React.memo(({ log }) => {

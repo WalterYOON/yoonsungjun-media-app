@@ -34,6 +34,19 @@ const PlanModal = () => {
         setPendingTasks(prev => [...prev, taskToAdd]); setNewTask(prev => ({ ...prev, detail: '' }));
     };
     const handleRemovePendingTask = (id) => { setPendingTasks(pendingTasks.filter(t => t.id !== id)); };
+
+    // Ctrl+S 저장 단축키
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                handleSubmit({ preventDefault: () => { } });
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [formData, pendingTasks]);
+
     if (!modals.plan) return null;
 
     const handleSubmit = async (e, forceStatus) => {
