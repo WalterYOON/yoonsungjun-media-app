@@ -1,0 +1,1 @@
+*{box-sizing:border-box}body{margin:0;font-family:Noto Sans KR,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}#root{min-height:100vh}[contenteditable][data-placeholder]:empty:before{content:attr(data-placeholder);color:#b0a090;pointer-events:none}
