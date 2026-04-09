@@ -27,10 +27,6 @@ const ScheduleModal = () => {
         }
     }, [modals.schedule, selectedItems.task, profile, selectedDate]);
 
-    if (!modals.schedule) return null;
-
-    const handleCreate = (type) => { setTab(type === 'personal' ? 'personal' : 'work'); const defaultDate = selectedDate || formatDateLocal(new Date()); setFormData(prev => ({ ...prev, author: profile || DEFAULT_AUTHOR, category: type === 'personal' ? ['연차'] : ['대본'], details: '', status: type === 'personal' ? 'done' : 'in_progress', planId: '', type: type, workStartDate: defaultDate, workEndDate: defaultDate, completedDates: [] })); setMode('create'); };
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleSaveInternal = useCallback(async () => {
         setIsSaving(true);
@@ -42,7 +38,7 @@ const ScheduleModal = () => {
         } else { showToast(result.message || "저장 실패", 'error'); }
     }, [formData, mode, syncGroup, selectedItems.task, operations, showToast, toggleModal]);
 
-    // Ctrl+S 저장 단축키
+    // Ctrl+S 저장 단축키 (훅은 반드시 early return 이전에 위치해야 함)
     useEffect(() => {
         const handleKeyDown = (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -53,6 +49,11 @@ const ScheduleModal = () => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [mode, handleSaveInternal]);
+
+    if (!modals.schedule) return null;
+
+    const handleCreate = (type) => { setTab(type === 'personal' ? 'personal' : 'work'); const defaultDate = selectedDate || formatDateLocal(new Date()); setFormData(prev => ({ ...prev, author: profile || DEFAULT_AUTHOR, category: type === 'personal' ? ['연차'] : ['대본'], details: '', status: type === 'personal' ? 'done' : 'in_progress', planId: '', type: type, workStartDate: defaultDate, workEndDate: defaultDate, completedDates: [] })); setMode('create'); };
+
     const toggleDateCompletion = async (dateStr) => { if (!formData.id) return; let newCompletedDates = [...(formData.completedDates || [])]; if (newCompletedDates.includes(dateStr)) { newCompletedDates = newCompletedDates.filter(d => d !== dateStr); } else { newCompletedDates.push(dateStr); } setFormData(prev => ({ ...prev, completedDates: newCompletedDates })); await operations.saveTask({ ...formData, completedDates: newCompletedDates, id: selectedItems.task?.id }, true, false, !!formData.groupId); };
     const toggleCategory = (cat, isPersonal = false) => { setFormData(prev => { if (isPersonal) return { ...prev, category: [cat] }; const current = prev.category || []; if (current.includes(cat)) return { ...prev, category: current.filter(c => c !== cat) }; return { ...prev, category: [...current, cat] }; }); };
     const handleDelete = async () => { openConfirm("정말 이 일정을 삭제하시겠습니까?", async () => { const res = await operations.deleteTask(selectedItems.task.id, selectedItems.task.topic, syncGroup ? selectedItems.task.groupId : null); if (res) { showToast("삭제되었습니다."); setMode('list'); } else { showToast("삭제 실패", 'error'); } }); };
