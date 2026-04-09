@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Settings, LogOut, Archive, Upload, Loader, AlertTriangle, Zap, Trash, Lock, Eye, EyeOff, Check } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TEAM_MEMBERS } from '../../config/constants';
-import { SAMPLE_PLANS, SAMPLE_TASKS, SAMPLE_FINANCES, SAMPLE_INQUIRIES } from '../../data/sampleData';
+
 import { formatDateLocal } from '../../utils/dateUtils';
 import { collection, getDocs, writeBatch } from 'firebase/firestore';
 import { db, appId, auth } from '../../config/firebase';
@@ -138,13 +138,7 @@ const SettingsTab = () => {
                     snap.docs.forEach(d => batch.delete(d.ref));
                     await batch.commit();
                 }
-                // 2. 하드코딩 샘플 데이터 숨기기 (localStorage 삭제된 ID 등록)
-                const allPlanIds = SAMPLE_PLANS.map(p => p.id);
-                const allTaskIds = SAMPLE_TASKS.map(t => t.id);
-                const allMgmtIds = [...SAMPLE_FINANCES, ...SAMPLE_INQUIRIES].map(m => m.id);
-                localStorage.setItem('deleted_sample_plans', JSON.stringify(allPlanIds));
-                localStorage.setItem('deleted_sample_tasks', JSON.stringify(allTaskIds));
-                localStorage.setItem('deleted_sample_mgmt', JSON.stringify(allMgmtIds));
+                // localStorage의 샘플 관련 수정 이력 초기화
                 localStorage.removeItem('modified_sample_plans');
                 localStorage.removeItem('modified_sample_tasks');
                 localStorage.removeItem('modified_sample_mgmt');

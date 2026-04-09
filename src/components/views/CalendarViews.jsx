@@ -1,14 +1,13 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { CheckCircle, ClipboardList, Plus, User, Calendar as CalendarIcon, FileText, Activity, StickyNote } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { HOLIDAYS, WORK_CATEGORIES, PERSONAL_CATEGORIES, PLAN_COLUMNS, MEMBER_COLORS, MEMBER_COLORS_DEFAULT, PROJECT_BORDER_COLORS } from '../../config/constants';
+import { HOLIDAYS, WORK_CATEGORIES, PERSONAL_CATEGORIES, PLAN_COLUMNS, MEMBER_COLORS, MEMBER_COLORS_DEFAULT, PROJECT_TYPE_COLORS } from '../../config/constants';
 import { formatDateLocal, getWeekDays, getDaysDifference, parseLocalDate } from '../../utils/dateUtils';
 
-// planId → 프로젝트 고유 테두리 색상 결정 (해시 기반, 항상 동일)
-const getProjectBorderColor = (planId) => {
-    if (!planId) return '#a89880';
-    const hash = planId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-    return PROJECT_BORDER_COLORS[hash % PROJECT_BORDER_COLORS.length];
+// B-2: 프로젝트 타입 → 상단 바 + 전체 테두리 색상
+const getProjectTypeColor = (plan, isPersonal) => {
+    if (isPersonal) return PROJECT_TYPE_COLORS['personal'];
+    return PROJECT_TYPE_COLORS[plan?.type] || PROJECT_TYPE_COLORS['main'];
 };
 
 // 담당자 기반 색상 결정 함수 (방식 1: 배경=담당자, 테두리=프로젝트)
@@ -25,22 +24,29 @@ export const TaskBar = React.memo(({ task, plans, isPersonal, onClick }) => {
     const isDraft = !isPersonal && linkedPlan?.status === 'draft';
     const isCompleted = !isPersonal && linkedPlan?.status === 'completed';
     const memberColor = isPersonal ? null : (MEMBER_COLORS[task.author] || MEMBER_COLORS_DEFAULT);
-    const projectBorderColor = isPersonal ? '#a0714a' : getProjectBorderColor(task.planId);
+    // B-2: 프로젝트 타입 색상 (본편=파랑, 숏츠=주황, 개인=갈색)
+    const typeColor = getProjectTypeColor(linkedPlan, isPersonal);
     let IconComp = null;
     if (isPersonal) { const cat = task.category?.[0]; IconComp = PERSONAL_CATEGORIES[cat]?.icon; }
     else { const primaryCategory = task.category?.[0]; IconComp = WORK_CATEGORIES[primaryCategory]?.icon || FileText; }
     const totalWorkDays = getDaysDifference(task.workStartDate, task.workEndDate) + 1;
     const getProgress = () => { if (task.status === 'done') return 100; if (!task.completedDates || task.completedDates.length === 0) return 0; if (totalWorkDays <= 0) return 0; return Math.round((task.completedDates.length / totalWorkDays) * 100); };
     const progress = getProgress();
-    // 인라인 스타일로 색상 적용 (Tailwind 동적 클래스 제한 우회)
+    // B-2: 배경=담당자색, 상단 두꺼운 바+전체 얇은 테두리=프로젝트타입색
     const getDraftBg = (rgbaStr) => rgbaStr.replace(/[\d.]+\)$/, '0.35)');
+    const makeBorder = (color, draft = false) => ({
+        borderTop: `4px solid ${color}`,
+        borderLeft: `1.5px ${draft ? 'dashed' : 'solid'} ${color}`,
+        borderRight: `1.5px ${draft ? 'dashed' : 'solid'} ${color}`,
+        borderBottom: `1.5px ${draft ? 'dashed' : 'solid'} ${color}`,
+    });
     const blockStyle = isPersonal
-        ? { backgroundColor: 'rgba(160, 113, 74, 0.35)', color: '#c4a06a', borderLeft: `4px solid ${projectBorderColor}` }
+        ? { backgroundColor: 'rgba(160, 113, 74, 0.35)', color: '#c4a06a', ...makeBorder(typeColor) }
         : isCompleted
-            ? { backgroundColor: 'rgba(68,64,60,0.7)', color: '#a89880', borderLeft: `4px solid ${projectBorderColor}`, opacity: 0.65 }
+            ? { backgroundColor: 'rgba(68,64,60,0.7)', color: '#a89880', ...makeBorder(typeColor), opacity: 0.65 }
             : isDraft
-                ? { backgroundColor: getDraftBg(memberColor.bg), color: memberColor.text, borderLeft: `4px solid ${projectBorderColor}`, outline: '1px dashed rgba(255,255,255,0.35)' }
-                : { backgroundColor: memberColor.bg, color: memberColor.text, borderLeft: `4px solid ${projectBorderColor}` };
+                ? { backgroundColor: getDraftBg(memberColor.bg), color: memberColor.text, ...makeBorder(typeColor, true) }
+                : { backgroundColor: memberColor.bg, color: memberColor.text, ...makeBorder(typeColor) };
     const displayText = isPersonal
         ? (task.details || task.category?.[0] || '개인')
         : (linkedPlan?.topic || task.details || task.topic || '업무');

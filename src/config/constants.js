@@ -54,6 +54,13 @@ export const MEMBER_COLORS = {
 };
 export const MEMBER_COLORS_DEFAULT = { bg: 'rgba(100, 100, 100, 0.65)', text: '#ffffff', hoverBg: 'rgba(100,100,100,0.85)' };
 
+// B-2: 프로젝트 타입별 상단 바 + 전체 테두리 색상 (본편=파랑, 숏츠=주황, 개인=갈색)
+export const PROJECT_TYPE_COLORS = {
+    'main':     '#2d6ec2',
+    'shorts':   '#d4640a',
+    'personal': '#a0714a',
+};
+
 // 프로젝트 왼쪽 테두리 색상 팔레트 (planId 해시 → 인덱스)
 export const PROJECT_BORDER_COLORS = [
     '#e07b4a', // 주황

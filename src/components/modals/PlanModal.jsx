@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X, Layout, Trash, Minimize2, Maximize2, Save, Loader, Star, Archive, FileText, StickyNote, Briefcase, Plus, ArrowRight, MapPin } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { PROJECT_TYPES, TEAM_MEMBERS, DEFAULT_AUTHOR, WORK_CATEGORIES } from '../../config/constants';
@@ -35,21 +35,7 @@ const PlanModal = () => {
     };
     const handleRemovePendingTask = (id) => { setPendingTasks(pendingTasks.filter(t => t.id !== id)); };
 
-    // Ctrl+S 저장 단축키
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                handleSubmit({ preventDefault: () => { } });
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [formData, pendingTasks]);
-
-    if (!modals.plan) return null;
-
-    const handleSubmit = async (e, forceStatus) => {
+    const handleSubmit = useCallback(async (e, forceStatus) => {
         e.preventDefault();
         if (forceStatus && !initialData?.id) { showToast("오류: 저장되지 않은 기획안은 상태를 변경할 수 없습니다. 먼저 저장해주세요.", 'error'); return; }
         setIsSaving(true);
@@ -73,7 +59,19 @@ const PlanModal = () => {
             else if (forceStatus === 'completed') { showToast("프로젝트가 완료 처리되었습니다."); }
             else { showToast("저장되었습니다."); }
         } else { setIsSaving(false); showToast("오류 발생", 'error'); }
-    };
+    }, [formData, pendingTasks, initialData, operations, showToast, toggleModal]);
+
+    // Ctrl+S 저장 단축키
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                handleSubmit({ preventDefault: () => { } });
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [handleSubmit]);
 
     const handleDelete = async () => { if (!initialData) return; openConfirm("이 기획안과 연결된 모든 일정을 영구 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.", async () => { const result = await operations.deletePlan(initialData.id, initialData.topic); if (result) { showToast("기획안이 삭제되었습니다."); toggleModal('plan', false); } else { showToast("삭제 실패", 'error'); } }); };
     const relatedTasks = initialData ? tasks.filter(t => t.planId === initialData.id).sort((a, b) => new Date(a.workStartDate) - new Date(b.workStartDate)) : [];
@@ -84,6 +82,8 @@ const PlanModal = () => {
             <div className="p-4 border-b border-[#e8dcc8] flex justify-between items-center bg-[#faf6ef]"><h3 className="font-bold text-lg text-[#42392e] flex items-center gap-2"><FileText size={20} /> 기획안 전체화면</h3><button onClick={() => setIsScriptMode(false)} className="p-2 bg-[#faf6ef] border border-[#d4c4ac] rounded-lg text-[#6a5d50] hover:bg-[#f5f0e6] font-bold text-sm flex items-center gap-2"><Minimize2 size={16} /> 닫기</button></div><div className="flex-1 p-6 bg-[#faf6ef] overflow-hidden flex flex-col"><RichTextEditor className="flex-1 shadow-sm h-full" value={formData.script} onChange={(val) => setFormData(prev => ({ ...prev, script: val }))} placeholder="여기에 기획 내용, 대본, 큐시트를 작성하세요." /></div>
         </div>
     );
+
+    if (!modals.plan) return null;
 
     return (
         <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-[#3a2d20]/30 backdrop-blur-sm p-4 ${isFullScreen ? 'p-0' : 'p-4'}`}>

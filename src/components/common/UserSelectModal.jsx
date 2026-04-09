@@ -81,8 +81,11 @@ const UserSelectModal = () => {
 
                 <div className="bg-[#faf6ef] rounded-2xl shadow-2xl overflow-hidden">
                     <form onSubmit={handleLogin} className="p-8">
-                        <h2 className="text-2xl font-black text-[#42392e] mb-1">로그인</h2>
+                    <h2 className="text-2xl font-black text-[#42392e] mb-1">로그인</h2>
                         <p className="text-base text-[#857460] mb-7">아이디와 비밀번호를 입력해주세요</p>
+                        {/* 브라우저 자동완성 차단용 더미 필드 (화면 밖에 숨김) */}
+                        <input type="text" style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }} autoComplete="username" tabIndex={-1} aria-hidden="true" readOnly />
+                        <input type="password" style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }} autoComplete="current-password" tabIndex={-1} aria-hidden="true" readOnly />
 
                         {/* 아이디 입력 */}
                         <div className="mb-4">
@@ -96,7 +99,7 @@ const UserSelectModal = () => {
                                     value={idPrefix}
                                     onChange={(e) => { setIdPrefix(e.target.value.replace(/\s/g, '')); setError(''); }}
                                     placeholder="예: sungjun.yoon"
-                                    autoComplete="username"
+                                    autoComplete="off"
                                     className="min-w-0 flex-1 pl-4 py-3.5 bg-transparent text-base text-[#42392e] focus:outline-none"
                                 />
                                 <span className="flex-shrink-0 px-3 text-base text-[#a0714a] font-semibold whitespace-nowrap select-none">
@@ -118,7 +121,7 @@ const UserSelectModal = () => {
                                     value={password}
                                     onChange={(e) => { setPassword(e.target.value); setError(''); }}
                                     placeholder="비밀번호 입력"
-                                    autoComplete="current-password"
+                                    autoComplete="new-password"
                                     className="flex-1 px-3 py-3.5 bg-transparent text-base text-[#42392e] focus:outline-none"
                                 />
                                 <button
