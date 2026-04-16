@@ -153,10 +153,18 @@ const InquiryGridView = ({ filteredInquiries, onInquiryClick, onStatusChange }) 
                 return (
                     <div
                         ref={popoverRef}
-                        className="fixed z-[200] bg-[#faf6ef] border border-[#d4c4ac] rounded-2xl shadow-2xl overflow-hidden"
+                        className="fixed z-[200] bg-[#faf6ef] border border-[#d4c4ac] rounded-2xl shadow-2xl overflow-y-auto"
                         style={{
                             width: '480px',
-                            top: Math.min(activePopover.rect.top, window.innerHeight - 480),
+                            maxHeight: 'calc(100vh - 32px)',
+                            top: (() => {
+                                const popH = Math.min(520, window.innerHeight - 32);
+                                const below = window.innerHeight - activePopover.rect.top;
+                                if (below >= popH) {
+                                    return activePopover.rect.top;
+                                }
+                                return Math.max(16, window.innerHeight - popH);
+                            })(),
                             left: Math.min(activePopover.rect.right + 12, window.innerWidth - 496),
                         }}
                     >
