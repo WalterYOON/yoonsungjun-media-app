@@ -88,8 +88,8 @@ const InquiryGridView = ({ filteredInquiries, onInquiryClick, onStatusChange }) 
     const StatusBadge = ({ status }) => {
         const s = INQUIRY_STATUS[status] || INQUIRY_STATUS['reviewing'];
         return (
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${s.color}`}>
-                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: s.dot }} />
+            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold border ${s.color}`}>
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: s.dot }} />
                 {s.label}
             </span>
         );
@@ -101,17 +101,17 @@ const InquiryGridView = ({ filteredInquiries, onInquiryClick, onStatusChange }) 
         return (
             <div
                 onClick={(e) => handleCardClick(e, item)}
-                className={`bg-[#f0e9de] p-3 rounded-xl border cursor-pointer transition-all group relative ${isActive ? 'border-[#a0714a] shadow-md' : 'border-[#d4c4ac] hover:border-[#a0714a]/60'}`}
+                className={`bg-[#f0e9de] p-3.5 rounded-xl border cursor-pointer transition-all group relative ${isActive ? 'border-[#a0714a] shadow-md' : 'border-[#d4c4ac] hover:border-[#a0714a]/60'}`}
             >
-                <div className="flex justify-between items-center mb-1.5">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${categoryInfo.color}`}>{categoryInfo.label}</span>
-                    <span className="text-[10px] text-[#a89880] font-mono">{item.receivedDate}</span>
+                <div className="flex justify-between items-center mb-2">
+                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold border ${categoryInfo.color}`}>{categoryInfo.label}</span>
+                    <span className="text-xs text-[#a89880] font-mono">{item.receivedDate}</span>
                 </div>
-                <h4 className={`font-bold text-sm mb-1 transition-colors ${isActive ? 'text-[#a0714a]' : 'text-[#42392e] group-hover:text-[#a0714a]'}`}>{item.sender}</h4>
-                <p className="text-xs text-[#857460] line-clamp-1 mb-2">{item.subject}</p>
+                <h4 className={`font-bold text-base mb-1 transition-colors ${isActive ? 'text-[#a0714a]' : 'text-[#42392e] group-hover:text-[#a0714a]'}`}>{item.sender}</h4>
+                <p className="text-sm text-[#857460] line-clamp-1 mb-2.5">{item.subject}</p>
                 <div className="flex justify-between items-center">
                     <StatusBadge status={item.status || 'reviewing'} />
-                    <ChevronRight size={12} className={`text-[#a89880] transition-transform ${isActive ? 'rotate-90 text-[#a0714a]' : ''}`} />
+                    <ChevronRight size={14} className={`text-[#a89880] transition-transform ${isActive ? 'rotate-90 text-[#a0714a]' : ''}`} />
                 </div>
             </div>
         );
@@ -121,8 +121,8 @@ const InquiryGridView = ({ filteredInquiries, onInquiryClick, onStatusChange }) 
         <div className="vj-card bg-[#faf6ef] rounded-2xl border border-[#d4c4ac] flex flex-col overflow-hidden">
             <div className="p-4 border-b border-[#d4c4ac] bg-[#f0e9de] flex-shrink-0">
                 <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-[#42392e] text-sm flex items-center gap-2"><Mail size={16} className="text-[#a0714a]" />{label}</h3>
-                    <span className="bg-[#44403c] text-[#857460] px-2 py-0.5 rounded-full text-xs font-bold">{items.length}</span>
+                    <h3 className="font-bold text-[#42392e] text-base flex items-center gap-2"><Mail size={17} className="text-[#a0714a]" />{label}</h3>
+                    <span className="bg-[#44403c] text-[#857460] px-2.5 py-0.5 rounded-full text-sm font-bold">{items.length}</span>
                 </div>
             </div>
             <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
@@ -153,36 +153,37 @@ const InquiryGridView = ({ filteredInquiries, onInquiryClick, onStatusChange }) 
                 return (
                     <div
                         ref={popoverRef}
-                        className="fixed z-[200] w-80 bg-[#faf6ef] border border-[#d4c4ac] rounded-2xl shadow-2xl overflow-hidden"
+                        className="fixed z-[200] bg-[#faf6ef] border border-[#d4c4ac] rounded-2xl shadow-2xl overflow-hidden"
                         style={{
-                            top: Math.min(activePopover.rect.top, window.innerHeight - 440),
-                            left: Math.min(activePopover.rect.right + 8, window.innerWidth - 340),
+                            width: '480px',
+                            top: Math.min(activePopover.rect.top, window.innerHeight - 480),
+                            left: Math.min(activePopover.rect.right + 12, window.innerWidth - 496),
                         }}
                     >
                         {/* 헤더 */}
-                        <div className="p-4 bg-[#f0e9de] border-b border-[#d4c4ac] flex justify-between items-start">
+                        <div className="p-5 bg-[#f0e9de] border-b border-[#d4c4ac] flex justify-between items-start">
                             <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${categoryInfo.color}`}>{categoryInfo.label}</span>
-                                    <span className="text-[10px] text-[#a89880] font-mono">{item.receivedDate}</span>
+                                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold border ${categoryInfo.color}`}>{categoryInfo.label}</span>
+                                    <span className="text-xs text-[#a89880] font-mono">{item.receivedDate}</span>
                                 </div>
-                                <h4 className="font-bold text-[#42392e] text-sm">{item.sender}</h4>
-                                <p className="text-xs text-[#857460] mt-0.5 line-clamp-1">{item.subject}</p>
+                                <h4 className="font-bold text-[#42392e] text-lg">{item.sender}</h4>
+                                <p className="text-sm text-[#857460] mt-1 line-clamp-1">{item.subject}</p>
                             </div>
-                            <button onClick={() => setActivePopover(null)} className="p-1 hover:bg-[#d4c4ac]/50 rounded-full ml-2 flex-shrink-0">
-                                <X size={14} className="text-[#857460]" />
+                            <button onClick={() => setActivePopover(null)} className="p-1.5 hover:bg-[#d4c4ac]/50 rounded-full ml-2 flex-shrink-0">
+                                <X size={16} className="text-[#857460]" />
                             </button>
                         </div>
 
                         {/* 본문 */}
-                        <div className="p-4 max-h-40 overflow-y-auto custom-scrollbar">
-                            <p className="text-xs text-[#42392e] leading-relaxed whitespace-pre-wrap">{item.content || '(내용 없음)'}</p>
+                        <div className="p-5 max-h-60 overflow-y-auto custom-scrollbar">
+                            <p className="text-sm text-[#42392e] leading-relaxed whitespace-pre-wrap">{item.content || '(내용 없음)'}</p>
                         </div>
 
                         {/* 대응 상태 변경 */}
-                        <div className="p-4 border-t border-[#d4c4ac] bg-[#f5f0e8]">
-                            <p className="text-[10px] font-bold text-[#857460] mb-2">대응 상태</p>
-                            <div className="flex gap-1.5 flex-wrap">
+                        <div className="p-5 border-t border-[#d4c4ac] bg-[#f5f0e8]">
+                            <p className="text-xs font-bold text-[#857460] mb-2.5">대응 상태</p>
+                            <div className="flex gap-2 flex-wrap">
                                 {Object.entries(INQUIRY_STATUS).map(([key, val]) => (
                                     <button
                                         key={key}
@@ -190,7 +191,7 @@ const InquiryGridView = ({ filteredInquiries, onInquiryClick, onStatusChange }) 
                                             onStatusChange(item.id, key);
                                             setActivePopover(prev => prev ? { ...prev, item: { ...prev.item, status: key } } : null);
                                         }}
-                                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${(item.status || 'reviewing') === key ? val.color : 'bg-[#f0e9de] text-[#857460] border-[#d4c4ac] hover:bg-[#e8dcc8]'}`}
+                                        className={`px-4 py-1.5 rounded-lg text-sm font-bold border transition-all ${(item.status || 'reviewing') === key ? val.color : 'bg-[#f0e9de] text-[#857460] border-[#d4c4ac] hover:bg-[#e8dcc8]'}`}
                                     >
                                         {val.label}
                                     </button>
@@ -199,12 +200,12 @@ const InquiryGridView = ({ filteredInquiries, onInquiryClick, onStatusChange }) 
                         </div>
 
                         {/* 수정 버튼 */}
-                        <div className="px-4 pb-4">
+                        <div className="px-5 pb-5">
                             <button
                                 onClick={() => { onInquiryClick(item); setActivePopover(null); }}
-                                className="w-full py-2 vj-btn-primary text-[#faf6ef] font-bold rounded-xl text-xs flex items-center justify-center gap-2"
+                                className="w-full py-2.5 vj-btn-primary text-[#faf6ef] font-bold rounded-xl text-sm flex items-center justify-center gap-2"
                             >
-                                <Edit size={12} />상세 수정
+                                <Edit size={14} />상세 수정
                             </button>
                         </div>
                     </div>
