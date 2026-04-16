@@ -1,5 +1,13 @@
 import { Film, Zap, FileEdit, Video, Scissors, RefreshCcw, Plane, Coffee, MapPin, User, Smile } from 'lucide-react';
 
+// 제휴/문의 대응 상태
+export const INQUIRY_STATUS = {
+    'reviewing': { label: '검토 중', color: 'bg-[#b8860b]/20 text-[#b8860b] border-[#b8860b]/40', dot: '#b8860b' },
+    'accepted':  { label: '수락',    color: 'bg-[#5d7a5d]/20 text-[#5d7a5d] border-[#5d7a5d]/40', dot: '#5d7a5d' },
+    'rejected':  { label: '거절',    color: 'bg-[#9b4d4d]/20 text-[#9b4d4d] border-[#9b4d4d]/40', dot: '#9b4d4d' },
+    'pending':   { label: '보류',    color: 'bg-[#857460]/20 text-[#857460] border-[#857460]/40', dot: '#857460' },
+};
+
 // 제휴/문의 분류
 export const INQUIRY_CATEGORIES = {
     'sponsor': { label: '협찬', color: 'bg-[#a0714a]/20 text-[#a0714a] border-[#a0714a]/30' },

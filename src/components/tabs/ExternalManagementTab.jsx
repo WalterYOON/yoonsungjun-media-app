@@ -1,9 +1,9 @@
 // ExternalManagementTab - 원본 라인 3018~3898
 // FinanceSplitView, FinanceSubTab, InquiryGridView, InquirySubTab, ExternalManagementTab 통합
-import React, { useState, useMemo } from 'react';
-import { Plus, DollarSign, ShoppingBag, Mail, Search, Download, Edit, ExternalLink, LayoutGrid, Columns, Briefcase, Activity, Inbox } from 'lucide-react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { Plus, DollarSign, ShoppingBag, Mail, Search, Download, Edit, ExternalLink, LayoutGrid, Columns, Briefcase, Activity, Inbox, X, ChevronRight } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { INQUIRY_CATEGORIES } from '../../config/constants';
+import { INQUIRY_CATEGORIES, INQUIRY_STATUS } from '../../config/constants';
 import { formatDateLocal, parseLocalDate } from '../../utils/dateUtils';
 import useDebounce from '../../hooks/useDebounce';
 
@@ -16,13 +16,174 @@ const FinanceSplitView = ({ filteredItems, plans, onItemClick }) => {
     return (<div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[600px]"><div className="vj-card bg-[#faf6ef] rounded-2xl border border-[#d4c4ac] flex flex-col overflow-hidden"><div className="p-5 border-b border-[#d4c4ac] bg-emerald-900/20 flex-shrink-0"><div className="flex items-center gap-2 mb-2"><DollarSign size={20} className="text-[#5d7a5d]" /><h3 className="font-bold text-[#5d7a5d] text-sm">수입</h3><span className="ml-auto bg-[#5d7a5d]/20 text-[#5d7a5d] px-2 py-0.5 rounded-full text-xs font-bold">{categorizedItems.income.length}건</span></div><div className="text-2xl font-black text-[#5d7a5d]">₩{totalIncome.toLocaleString()}</div></div><div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">{categorizedItems.income.length === 0 ? (<div className="flex flex-col items-center justify-center h-full text-[#5d7a5d]/30"><DollarSign size={48} className="mb-2" /><span className="text-xs">수입 내역 없음</span></div>) : (categorizedItems.income.map(item => (<FinanceCard key={item.id} item={item} />)))}</div></div><div className="vj-card bg-[#faf6ef] rounded-2xl border border-[#d4c4ac] flex flex-col overflow-hidden"><div className="p-5 border-b border-[#d4c4ac] bg-rose-900/20 flex-shrink-0"><div className="flex items-center gap-2 mb-2"><ShoppingBag size={20} className="text-[#9b4d4d]" /><h3 className="font-bold text-[#9b4d4d] text-sm">지출</h3><span className="ml-auto bg-[#9b4d4d]/20 text-[#9b4d4d] px-2 py-0.5 rounded-full text-xs font-bold">{categorizedItems.expense.length}건</span></div><div className="text-2xl font-black text-[#9b4d4d]">₩{totalExpense.toLocaleString()}</div></div><div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">{categorizedItems.expense.length === 0 ? (<div className="flex flex-col items-center justify-center h-full text-[#9b4d4d]/30"><ShoppingBag size={48} className="mb-2" /><span className="text-xs">지출 내역 없음</span></div>) : (categorizedItems.expense.map(item => (<FinanceCard key={item.id} item={item} />)))}</div></div></div>);
 };
 
-// InquiryGridView
-const InquiryGridView = ({ filteredInquiries, onInquiryClick }) => {
-    const categorizedInquiries = useMemo(() => ({ sponsor: filteredInquiries.filter(i => i.type === 'sponsor').sort((a, b) => new Date(b.receivedDate || 0) - new Date(a.receivedDate || 0)), partnership: filteredInquiries.filter(i => i.type === 'partnership').sort((a, b) => new Date(b.receivedDate || 0) - new Date(a.receivedDate || 0)), inquiry: filteredInquiries.filter(i => i.type === 'inquiry').sort((a, b) => new Date(b.receivedDate || 0) - new Date(a.receivedDate || 0)), other: filteredInquiries.filter(i => i.type === 'other').sort((a, b) => new Date(b.receivedDate || 0) - new Date(a.receivedDate || 0)) }), [filteredInquiries]);
-    const InquiryCard = ({ item }) => { const categoryInfo = INQUIRY_CATEGORIES[item.type] || INQUIRY_CATEGORIES['other']; return (<div onClick={() => onInquiryClick(item)} className="bg-[#f0e9de] p-4 rounded-xl border border-[#d4c4ac] hover:border-[#a0714a] cursor-pointer transition-all group"><div className="flex justify-between items-start mb-2"><span className={`text-[10px] px-2 py-1 rounded-full font-bold border ${categoryInfo.color}`}>{categoryInfo.label}</span><span className="text-xs text-[#a89880] font-mono">{item.receivedDate}</span></div><h4 className="font-bold text-[#42392e] text-sm mb-1 group-hover:text-[#a0714a] transition-colors">{item.sender}</h4><p className="text-xs text-[#857460] mb-2 line-clamp-1">{item.subject}</p>{item.content && (<p className="text-xs text-[#a89880] line-clamp-2 leading-relaxed">{item.content}</p>)}</div>); };
-    const InquirySection = ({ type, label, items }) => { const categoryInfo = INQUIRY_CATEGORIES[type]; return (<div className="vj-card bg-[#faf6ef] rounded-2xl border border-[#d4c4ac] flex flex-col overflow-hidden"><div className="p-4 border-b border-[#d4c4ac] bg-[#f0e9de] flex-shrink-0"><div className="flex items-center justify-between"><h3 className="font-bold text-[#42392e] text-sm flex items-center gap-2"><Mail size={16} className="text-[#a0714a]" />{label}</h3><span className="bg-[#44403c] text-[#857460] px-2 py-0.5 rounded-full text-xs font-bold">{items.length}</span></div></div><div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">{items.length === 0 ? (<div className="flex flex-col items-center justify-center h-full text-[#44403c] py-8"><Inbox size={32} className="mb-2 opacity-50" /><span className="text-xs">내역 없음</span></div>) : (items.map(item => (<InquiryCard key={item.id} item={item} />)))}</div></div>); };
-    return (<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4" style={{ height: '600px' }}><InquirySection type="sponsor" label={INQUIRY_CATEGORIES.sponsor.label} items={categorizedInquiries.sponsor} /><InquirySection type="partnership" label={INQUIRY_CATEGORIES.partnership.label} items={categorizedInquiries.partnership} /><InquirySection type="inquiry" label={INQUIRY_CATEGORIES.inquiry.label} items={categorizedInquiries.inquiry} /><InquirySection type="other" label={INQUIRY_CATEGORIES.other.label} items={categorizedInquiries.other} /></div>);
+// InquiryGridView (팝오버 + 상태 배지 버전)
+const InquiryGridView = ({ filteredInquiries, onInquiryClick, onStatusChange }) => {
+    const [activePopover, setActivePopover] = useState(null); // { item, rect }
+    const popoverRef = useRef(null);
+
+    // 팝오버 바깥 클릭 시 닫기
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (popoverRef.current && !popoverRef.current.contains(e.target)) {
+                setActivePopover(null);
+            }
+        };
+        if (activePopover) document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [activePopover]);
+
+    const categorizedInquiries = useMemo(() => ({
+        sponsor: filteredInquiries.filter(i => i.type === 'sponsor').sort((a, b) => new Date(b.receivedDate || 0) - new Date(a.receivedDate || 0)),
+        partnership: filteredInquiries.filter(i => i.type === 'partnership').sort((a, b) => new Date(b.receivedDate || 0) - new Date(a.receivedDate || 0)),
+        inquiry: filteredInquiries.filter(i => i.type === 'inquiry').sort((a, b) => new Date(b.receivedDate || 0) - new Date(a.receivedDate || 0)),
+        other: filteredInquiries.filter(i => i.type === 'other').sort((a, b) => new Date(b.receivedDate || 0) - new Date(a.receivedDate || 0))
+    }), [filteredInquiries]);
+
+    const handleCardClick = useCallback((e, item) => {
+        e.stopPropagation();
+        const rect = e.currentTarget.getBoundingClientRect();
+        setActivePopover(prev => prev?.item?.id === item.id ? null : { item, rect });
+    }, []);
+
+    const StatusBadge = ({ status }) => {
+        const s = INQUIRY_STATUS[status] || INQUIRY_STATUS['reviewing'];
+        return (
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${s.color}`}>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: s.dot }} />
+                {s.label}
+            </span>
+        );
+    };
+
+    const InquiryCard = ({ item }) => {
+        const categoryInfo = INQUIRY_CATEGORIES[item.type] || INQUIRY_CATEGORIES['other'];
+        const isActive = activePopover?.item?.id === item.id;
+        return (
+            <div
+                onClick={(e) => handleCardClick(e, item)}
+                className={`bg-[#f0e9de] p-3 rounded-xl border cursor-pointer transition-all group relative ${isActive ? 'border-[#a0714a] shadow-md' : 'border-[#d4c4ac] hover:border-[#a0714a]/60'}`}
+            >
+                {/* 상단: 분류 + 날짜 */}
+                <div className="flex justify-between items-center mb-1.5">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${categoryInfo.color}`}>{categoryInfo.label}</span>
+                    <span className="text-[10px] text-[#a89880] font-mono">{item.receivedDate}</span>
+                </div>
+                {/* 발신자 */}
+                <h4 className={`font-bold text-sm mb-1 transition-colors ${isActive ? 'text-[#a0714a]' : 'text-[#42392e] group-hover:text-[#a0714a]'}`}>{item.sender}</h4>
+                {/* 제목 */}
+                <p className="text-xs text-[#857460] line-clamp-1 mb-2">{item.subject}</p>
+                {/* 하단: 상태 배지 */}
+                <div className="flex justify-between items-center">
+                    <StatusBadge status={item.status || 'reviewing'} />
+                    <ChevronRight size={12} className={`text-[#a89880] transition-transform ${isActive ? 'rotate-90 text-[#a0714a]' : ''}`} />
+                </div>
+            </div>
+        );
+    };
+
+    const InquirySection = ({ type, label, items }) => {
+        const categoryInfo = INQUIRY_CATEGORIES[type];
+        return (
+            <div className="vj-card bg-[#faf6ef] rounded-2xl border border-[#d4c4ac] flex flex-col overflow-hidden">
+                <div className="p-4 border-b border-[#d4c4ac] bg-[#f0e9de] flex-shrink-0">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-bold text-[#42392e] text-sm flex items-center gap-2">
+                            <Mail size={16} className="text-[#a0714a]" />{label}
+                        </h3>
+                        <span className="bg-[#44403c] text-[#857460] px-2 py-0.5 rounded-full text-xs font-bold">{items.length}</span>
+                    </div>
+                </div>
+                <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                    {items.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full text-[#44403c] py-8">
+                            <Inbox size={32} className="mb-2 opacity-50" />
+                            <span className="text-xs">내역 없음</span>
+                        </div>
+                    ) : (items.map(item => (<InquiryCard key={item.id} item={item} />)))}
+                </div>
+            </div>
+        );
+    };
+
+    return (
+        <div className="relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4" style={{ height: '600px' }}>
+                <InquirySection type="sponsor" label={INQUIRY_CATEGORIES.sponsor.label} items={categorizedInquiries.sponsor} />
+                <InquirySection type="partnership" label={INQUIRY_CATEGORIES.partnership.label} items={categorizedInquiries.partnership} />
+                <InquirySection type="inquiry" label={INQUIRY_CATEGORIES.inquiry.label} items={categorizedInquiries.inquiry} />
+                <InquirySection type="other" label={INQUIRY_CATEGORIES.other.label} items={categorizedInquiries.other} />
+            </div>
+
+            {/* 클릭 팝오버 */}
+            {activePopover && (() => {
+                const item = activePopover.item;
+                const categoryInfo = INQUIRY_CATEGORIES[item.type] || INQUIRY_CATEGORIES['other'];
+                return (
+                    <div
+                        ref={popoverRef}
+                        className="fixed z-[200] w-80 bg-[#faf6ef] border border-[#d4c4ac] rounded-2xl shadow-2xl overflow-hidden"
+                        style={{
+                            top: Math.min(activePopover.rect.top, window.innerHeight - 420),
+                            left: Math.min(activePopover.rect.right + 8, window.innerWidth - 340),
+                        }}
+                    >
+                        {/* 팝오버 헤더 */}
+                        <div className="p-4 bg-[#f0e9de] border-b border-[#d4c4ac] flex justify-between items-start">
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${categoryInfo.color}`}>{categoryInfo.label}</span>
+                                    <span className="text-[10px] text-[#a89880] font-mono">{item.receivedDate}</span>
+                                </div>
+                                <h4 className="font-bold text-[#42392e] text-sm">{item.sender}</h4>
+                                <p className="text-xs text-[#857460] mt-0.5 line-clamp-1">{item.subject}</p>
+                            </div>
+                            <button
+                                onClick={() => setActivePopover(null)}
+                                className="p-1 hover:bg-[#d4c4ac]/50 rounded-full ml-2 flex-shrink-0"
+                            >
+                                <X size={14} className="text-[#857460]" />
+                            </button>
+                        </div>
+
+                        {/* 내용 */}
+                        <div className="p-4 max-h-40 overflow-y-auto custom-scrollbar">
+                            <p className="text-xs text-[#42392e] leading-relaxed whitespace-pre-wrap">
+                                {item.content || '(내용 없음)'}
+                            </p>
+                        </div>
+
+                        {/* 대응 상태 변경 */}
+                        <div className="p-4 border-t border-[#d4c4ac] bg-[#f5f0e8]">
+                            <p className="text-[10px] font-bold text-[#857460] mb-2">대응 상태</p>
+                            <div className="flex gap-1.5 flex-wrap">
+                                {Object.entries(INQUIRY_STATUS).map(([key, val]) => (
+                                    <button
+                                        key={key}
+                                        onClick={() => { onStatusChange(item.id, key); setActivePopover(prev => prev ? { ...prev, item: { ...prev.item, status: key } } : null); }}
+                                        className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${(item.status || 'reviewing') === key ? val.color : 'bg-[#f0e9de] text-[#857460] border-[#d4c4ac] hover:bg-[#e8dcc8]'}`}
+                                    >
+                                        {val.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* 상세 수정 버튼 */}
+                        <div className="px-4 pb-4">
+                            <button
+                                onClick={() => { onInquiryClick(item); setActivePopover(null); }}
+                                className="w-full py-2 vj-btn-primary text-[#faf6ef] font-bold rounded-xl text-xs flex items-center justify-center gap-2"
+                            >
+                                <Edit size={12} />상세 수정
+                            </button>
+                        </div>
+                    </div>
+                );
+            })()}
+        </div>
+    );
 };
+
 
 // FinanceSubTab
 const FinanceSubTab = () => {
@@ -42,13 +203,20 @@ const FinanceSubTab = () => {
 
 // InquirySubTab
 const InquirySubTab = () => {
-    const { managements, toggleModal, setSelectedItems } = useApp();
+    const { managements, toggleModal, setSelectedItems, operations, showToast } = useApp();
     const [filterType, setFilterType] = useState('all'); const [searchTerm, setSearchTerm] = useState(''); const [viewMode, setViewMode] = useState('grid');
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
     const inquiries = useMemo(() => managements.filter(m => m.category === 'inquiry').sort((a, b) => new Date(b.receivedDate || 0) - new Date(a.receivedDate || 0)), [managements]);
     const filteredInquiries = useMemo(() => inquiries.filter(item => { const typeMatch = filterType === 'all' || item.type === filterType; const searchMatch = !debouncedSearchTerm || item.sender?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) || item.subject?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) || item.content?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()); return typeMatch && searchMatch; }), [inquiries, filterType, debouncedSearchTerm]);
-    return (<div className="space-y-4"><div className="vj-card bg-[#faf6ef] rounded-2xl p-4 border border-[#d4c4ac]"><div className="flex items-center gap-4 flex-wrap"><div className="flex-1 min-w-[200px] relative"><Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a89880]" /><input type="text" placeholder="검색..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-[#f0e9de] border border-[#d4c4ac] rounded-xl text-sm text-[#42392e] placeholder-[#a89880] focus:outline-none focus:border-[#a0714a]" /></div><div className="flex p-1 bg-[#f0e9de] rounded-xl"><button onClick={() => setFilterType('all')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${filterType === 'all' ? 'bg-[#a0714a] text-[#faf6ef]' : 'text-[#857460] hover:bg-[#e8dcc8]'}`}>전체</button>{Object.entries(INQUIRY_CATEGORIES).map(([key, val]) => (<button key={key} onClick={() => setFilterType(key)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${filterType === key ? 'bg-[#a0714a] text-[#faf6ef]' : 'text-[#857460] hover:bg-[#e8dcc8]'}`}>{val.label}</button>))}</div><div className="flex p-1 bg-[#f0e9de] rounded-xl"><button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[#a0714a] text-[#faf6ef]' : 'text-[#857460] hover:bg-[#e8dcc8]'}`}><LayoutGrid size={16} /></button><button onClick={() => setViewMode('list')} className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[#a0714a] text-[#faf6ef]' : 'text-[#857460] hover:bg-[#e8dcc8]'}`}><Columns size={16} /></button></div><button onClick={() => { setSelectedItems(prev => ({ ...prev, inquiry: null })); toggleModal('inquiry', true); }} className="px-4 py-2 vj-btn-primary text-[#faf6ef] font-bold rounded-xl text-xs flex items-center gap-2"><Plus size={14} /> 등록</button></div></div>{viewMode === 'grid' ? (<InquiryGridView filteredInquiries={filteredInquiries} onInquiryClick={(item) => { setSelectedItems(prev => ({ ...prev, inquiry: item })); toggleModal('inquiry', true); }} />) : (<div className="vj-card bg-[#faf6ef] rounded-2xl border border-[#d4c4ac] overflow-hidden"><div className="overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">{filteredInquiries.length === 0 ? (<div className="text-center py-12"><Inbox size={48} className="text-[#857460] mx-auto mb-4 opacity-50" /><p className="text-[#857460]">등록된 문의 내역이 없습니다.</p></div>) : (<table className="w-full"><thead className="bg-[#f0e9de] sticky top-0"><tr className="text-left text-xs text-[#a89880]"><th className="px-5 py-3">분류</th><th className="px-5 py-3">보낸 곳</th><th className="px-5 py-3">제목 (내용)</th><th className="px-5 py-3">수신일</th></tr></thead><tbody>{filteredInquiries.map(item => (<tr key={item.id} onClick={() => { setSelectedItems(prev => ({ ...prev, inquiry: item })); toggleModal('inquiry', true); }} className="border-t border-[#d4c4ac] hover:bg-[#f5f0e6] cursor-pointer group"><td className="px-5 py-4"><span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold border ${INQUIRY_CATEGORIES[item.type]?.color || 'bg-[#857460]/20 text-[#857460] border-[#857460]/30'}`}>{INQUIRY_CATEGORIES[item.type]?.label || '기타'}</span></td><td className="px-5 py-4 text-sm text-[#42392e] font-bold">{item.sender}</td><td className="px-5 py-4"><div className="text-sm text-[#42392e] mb-0.5">{item.subject}</div><div className="text-xs text-[#a89880] line-clamp-1 group-hover:text-[#857460]">{item.content}</div></td><td className="px-5 py-4 text-xs text-[#a89880] font-mono">{item.receivedDate}</td></tr>))}</tbody></table>)}</div></div>)}</div>);
-};
+    const handleStatusChange = useCallback(async (itemId, newStatus) => {
+        const item = managements.find(m => m.id === itemId);
+        if (!item) return;
+        const updated = { ...item, status: newStatus };
+        if (await operations.saveManagement(updated, 'inquiry')) {
+            showToast('상태가 변경되었습니다.', 'success');
+        }
+    }, [managements, operations, showToast]);
+    return (<div className="space-y-4"><div className="vj-card bg-[#faf6ef] rounded-2xl p-4 border border-[#d4c4ac]"><div className="flex items-center gap-4 flex-wrap"><div className="flex-1 min-w-[200px] relative"><Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a89880]" /><input type="text" placeholder="검색..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-[#f0e9de] border border-[#d4c4ac] rounded-xl text-sm text-[#42392e] placeholder-[#a89880] focus:outline-none focus:border-[#a0714a]" /></div><div className="flex p-1 bg-[#f0e9de] rounded-xl"><button onClick={() => setFilterType('all')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${filterType === 'all' ? 'bg-[#a0714a] text-[#faf6ef]' : 'text-[#857460] hover:bg-[#e8dcc8]'}`}>전체</button>{Object.entries(INQUIRY_CATEGORIES).map(([key, val]) => (<button key={key} onClick={() => setFilterType(key)} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${filterType === key ? 'bg-[#a0714a] text-[#faf6ef]' : 'text-[#857460] hover:bg-[#e8dcc8]'}`}>{val.label}</button>))}</div><div className="flex p-1 bg-[#f0e9de] rounded-xl"><button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[#a0714a] text-[#faf6ef]' : 'text-[#857460] hover:bg-[#e8dcc8]'}`}><LayoutGrid size={16} /></button><button onClick={() => setViewMode('list')} className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[#a0714a] text-[#faf6ef]' : 'text-[#857460] hover:bg-[#e8dcc8]'}`}><Columns size={16} /></button></div><button onClick={() => { setSelectedItems(prev => ({ ...prev, inquiry: null })); toggleModal('inquiry', true); }} className="px-4 py-2 vj-btn-primary text-[#faf6ef] font-bold rounded-xl text-xs flex items-center gap-2"><Plus size={14} /> 등록</button></div></div>{viewMode === 'grid' ? (<InquiryGridView filteredInquiries={filteredInquiries} onInquiryClick={(item) => { setSelectedItems(prev => ({ ...prev, inquiry: item })); toggleModal('inquiry', true); }} onStatusChange={handleStatusChange} />) : (<div className="vj-card bg-[#faf6ef] rounded-2xl border border-[#d4c4ac] overflow-hidden"><div className="overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">{filteredInquiries.length === 0 ? (<div className="text-center py-12"><Inbox size={48} className="text-[#857460] mx-auto mb-4 opacity-50" /><p className="text-[#857460]">등록된 문의 내역이 없습니다.</p></div>) : (<table className="w-full"><thead className="bg-[#f0e9de] sticky top-0"><tr className="text-left text-xs text-[#a89880]"><th className="px-5 py-3">분류</th><th className="px-5 py-3">대응 상태</th><th className="px-5 py-3">보낸 곳</th><th className="px-5 py-3">제목 (내용)</th><th className="px-5 py-3">수신일</th></tr></thead><tbody>{filteredInquiries.map(item => { const statusInfo = INQUIRY_STATUS[item.status || 'reviewing']; return (<tr key={item.id} onClick={() => { setSelectedItems(prev => ({ ...prev, inquiry: item })); toggleModal('inquiry', true); }} className="border-t border-[#d4c4ac] hover:bg-[#f5f0e6] cursor-pointer group"><td className="px-5 py-4"><span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold border ${INQUIRY_CATEGORIES[item.type]?.color || 'bg-[#857460]/20 text-[#857460] border-[#857460]/30'}`}>{INQUIRY_CATEGORIES[item.type]?.label || '기타'}</span></td><td className="px-5 py-4"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusInfo.color}`}><span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusInfo.dot }} />{statusInfo.label}</span></td><td className="px-5 py-4 text-sm text-[#42392e] font-bold">{item.sender}</td><td className="px-5 py-4"><div className="text-sm text-[#42392e] mb-0.5">{item.subject}</div><div className="text-xs text-[#a89880] line-clamp-1 group-hover:text-[#857460]">{item.content}</div></td><td className="px-5 py-4 text-xs text-[#a89880] font-mono">{item.receivedDate}</td></tr>); })}</tbody></table>)}</div></div>)}</div>);
 
 // ExternalManagementTab
 const ExternalManagementTab = () => {
