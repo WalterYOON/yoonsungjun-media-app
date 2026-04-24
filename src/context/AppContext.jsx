@@ -27,6 +27,7 @@ export const AppProvider = ({ children }) => {
     const [managements, setManagements] = useState([...SAMPLE_FINANCES, ...SAMPLE_INQUIRIES]);
     const [loading, setLoading] = useState(false);
     const [viewMode, setViewMode] = useState('month');
+    const [reports, setReports] = useState([]);
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const showToast = useCallback((msg, type = 'success') => setToast({ message: msg, type }), []);
@@ -92,8 +93,12 @@ export const AppProvider = ({ children }) => {
             const firebaseData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             setManagements(firebaseData.sort((a, b) => new Date(b.datetime || b.receivedDate || 0) - new Date(a.datetime || a.receivedDate || 0)));
         });
+        const reportsQuery = query(collection(baseRef, 'weekly_reports'), orderBy('weekStart', 'desc'), limit(30));
+        const unsubReports = onSnapshot(reportsQuery, (snap) => {
+            setReports(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        });
 
-        return () => { unsubPlans(); unsubTasks(); unsubLogs(); unsubMgmt(); };
+        return () => { unsubPlans(); unsubTasks(); unsubLogs(); unsubMgmt(); unsubReports(); };
     }, [user]);
 
     const handleSetProfile = useCallback((name) => { setProfile(name); }, []);
@@ -382,6 +387,38 @@ export const AppProvider = ({ children }) => {
             } catch (error) { showToast('복원 실패: ' + error.message, 'error'); return false; }
         };
 
+        const saveReport = async (reportData) => {
+            if (!user) return { success: false };
+            try {
+                const { id, ...data } = reportData;
+                const cleanData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined));
+                if (id) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'weekly_reports', id), { ...cleanData, updatedAt: new Date().toISOString(), updatedBy: profile });
+                    return { success: true, id };
+                } else {
+                    const ref = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'weekly_reports'), { ...cleanData, createdAt: new Date().toISOString(), createdBy: profile });
+                    logActivity('create', `${cleanData.weekLabel} 주간 보고서 저장`);
+                    return { success: true, id: ref.id };
+                }
+            } catch (e) {
+                const { message } = handleFirebaseError(e, 'saveReport');
+                showToast(message, 'error');
+                return { success: false };
+            }
+        };
+
+        const deleteReport = async (id, weekLabel) => {
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'weekly_reports', id));
+                logActivity('delete', `${weekLabel} 주간 보고서 삭제`);
+                return true;
+            } catch (e) {
+                const { message } = handleFirebaseError(e, 'deleteReport');
+                showToast(message, 'error');
+                return false;
+            }
+        };
+
         return {
             saveTask, moveTask,
             updateStatus: async (task, newStatus) => {
@@ -398,7 +435,7 @@ export const AppProvider = ({ children }) => {
                     return result;
                 } catch (e) { return { success: false }; }
             },
-            deleteTask, savePlan, deletePlan, saveManagement, deleteManagement, exportAllData, importAllData
+            deleteTask, savePlan, deletePlan, saveManagement, deleteManagement, exportAllData, importAllData, saveReport, deleteReport
         };
     }, [user, plans, tasks, profile, logActivity, showToast, openConfirm, exportAllData]);
 
@@ -438,7 +475,7 @@ export const AppProvider = ({ children }) => {
     }, [filteredTasks]);
 
     const value = {
-        user, profile, setProfile: handleSetProfile, logout, plans, tasks, logs, managements, loading, operations, viewMode, setViewMode, currentDate, setCurrentDate, next, prev, today, filteredTasks, tasksByDate, selectedDate, setSelectedDate, toast, showToast, hideToast, confirmDialog, openConfirm, closeConfirm, selectedAuthors, setSelectedAuthors, toggleAuthor, filterStatus, setFilterStatus, searchTerm, setSearchTerm, modals, toggleModal, selectedItems, setSelectedItems, modalType, setModalType, onOpenPlan: (plan) => { setSelectedItems(prev => ({ ...prev, plan })); toggleModal('plan', true); }
+        user, profile, setProfile: handleSetProfile, logout, plans, tasks, logs, managements, reports, loading, operations, viewMode, setViewMode, currentDate, setCurrentDate, next, prev, today, filteredTasks, tasksByDate, selectedDate, setSelectedDate, toast, showToast, hideToast, confirmDialog, openConfirm, closeConfirm, selectedAuthors, setSelectedAuthors, toggleAuthor, filterStatus, setFilterStatus, searchTerm, setSearchTerm, modals, toggleModal, selectedItems, setSelectedItems, modalType, setModalType, onOpenPlan: (plan) => { setSelectedItems(prev => ({ ...prev, plan })); toggleModal('plan', true); }
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

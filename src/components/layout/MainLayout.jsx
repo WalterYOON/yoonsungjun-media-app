@@ -1,6 +1,6 @@
 // MainLayout - 원본 라인 4044~4081
 import React, { useState, useEffect } from 'react';
-import { Layout, Calendar as CalendarIcon, Film, Briefcase, Settings, Loader } from 'lucide-react';
+import { Layout, Calendar as CalendarIcon, Film, Briefcase, Settings, FileText, Loader } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import VintageStyles from '../../styles/VintageStyles';
 import { Toast } from '../common/Toast';
@@ -15,11 +15,13 @@ import { DashboardTab, ScheduleTab } from '../tabs/DashboardScheduleTabs';
 import ProjectTab from '../tabs/ProjectTab';
 import ExternalManagementTab from '../tabs/ExternalManagementTab';
 import SettingsTab from '../tabs/SettingsTab';
+import WeeklyReportTab from '../tabs/WeeklyReportTab';
 
 const MAIN_TABS = [
     { key: 'dashboard', label: '대시보드', icon: Layout },
     { key: 'schedule', label: '일정', icon: CalendarIcon },
     { key: 'project', label: '프로젝트', icon: Film },
+    { key: 'report', label: '보고서', icon: FileText },
     { key: 'external', label: '외부관리', icon: Briefcase },
     { key: 'settings', label: '설정', icon: Settings },
 ];
@@ -61,6 +63,7 @@ const MainLayout = () => {
                 {mainTab === 'dashboard' && <DashboardTab />}
                 {mainTab === 'schedule' && <ScheduleTab />}
                 {mainTab === 'project' && <ProjectTab />}
+                {mainTab === 'report' && <WeeklyReportTab />}
                 {mainTab === 'external' && <ExternalManagementTab />}
                 {mainTab === 'settings' && <SettingsTab />}
             </main>
